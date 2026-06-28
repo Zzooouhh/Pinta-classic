@@ -77,7 +77,7 @@ namespace Pinta.Docking.DockNotebook
 		static readonly int VerticalTextSize = (int)(11 * PixelScale);
 		const int TabSpacing = -1;
 		const int Radius = 2;
-		const int LeanWidth = 18;
+		const int LeanWidth = 2;
 		const int CloseButtonSize = 14;
 
 		const int TextOffset = 1;
@@ -837,15 +837,15 @@ namespace Pinta.Docking.DockNotebook
 			padding = (int)(padding * Math.Min (1.0, Math.Max (0.5, (tabBounds.Width - 30) / 70.0)));
 
 			ctx.LineWidth = 1;
-			LayoutTabBorder (ctx, allocation, tabBounds.Width, tabBounds.X, 0, active);
+			LayoutTabBorder (ctx, allocation, tabBounds.Width, tabBounds.X, 1, active);
 			ctx.ClosePath ();
 			using (var gr = new LinearGradient (tabBounds.X, TopBarPadding, tabBounds.X, allocation.Bottom)) {
 				if (active) {
 					gr.AddColorStop (0, Styles.BreadcrumbGradientStartColor.MultiplyAlpha (tab.Opacity));
 					gr.AddColorStop (1, Styles.BreadcrumbBackgroundColor.MultiplyAlpha (tab.Opacity));
 				} else {
-					gr.AddColorStop (0, CairoExtensions.ParseColor ("f4f4f4").MultiplyAlpha (tab.Opacity));
-					gr.AddColorStop (1, CairoExtensions.ParseColor ("cecece").MultiplyAlpha (tab.Opacity));
+					gr.AddColorStop (0, Styles.BreadcrumbInactiveGradientStartColor.MultiplyAlpha (tab.Opacity));
+					gr.AddColorStop (1, Styles.BreadcrumbBackgroundColor.MultiplyAlpha (tab.Opacity));
 				}
 				ctx.SetSource (gr);
 			}
@@ -856,21 +856,10 @@ namespace Pinta.Docking.DockNotebook
 			ctx.Stroke ();
 
 			ctx.SetSourceColor (Styles.BreadcrumbBorderColor.MultiplyAlpha (tab.Opacity));
-			LayoutTabBorder (ctx, allocation, tabBounds.Width, tabBounds.X, 0, active);
+			LayoutTabBorder (ctx, allocation, tabBounds.Width, tabBounds.X, 1, active);
 			ctx.StrokePreserve ();
 
-			if (tab.GlowStrength > 0) {
-				Gdk.Point mouse = tracker.MousePosition;
-				using (var rg = new RadialGradient (mouse.X, tabBounds.Bottom, 0, mouse.X, tabBounds.Bottom, 100)) {
-					rg.AddColorStop (0, new Cairo.Color (1, 1, 1, 0.4 * tab.Opacity * tab.GlowStrength));
-					rg.AddColorStop (1, new Cairo.Color (1, 1, 1, 0));
-
-					ctx.SetSource (rg);
-					ctx.Fill ();
-				}
-			} else {
-				ctx.NewPath ();
-			}
+			ctx.NewPath ();
 
 			// Render Close Button (do this first so we can tell how much text to render)
 

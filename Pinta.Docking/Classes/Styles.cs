@@ -30,81 +30,105 @@ namespace Pinta.Docking
 {
 	public static class Styles
 	{
-		public static readonly Cairo.Color BaseBackgroundColor = new Cairo.Color (1, 1, 1);
-		public static readonly Cairo.Color BaseForegroundColor = new Cairo.Color (0, 0, 0);
+		public static readonly Cairo.Color BaseBackgroundColor;
+		public static readonly Cairo.Color BaseForegroundColor;
+		public static readonly bool IsDarkTheme;
+
+		static Styles ()
+		{
+			var widget = new Gtk.Window (Gtk.WindowType.Popup);
+
+            // Force GTK to create the GdkWindow/style
+            widget.Realize ();
+
+			var style = widget.Style;
+
+			BaseBackgroundColor =
+				style.Background (Gtk.StateType.Normal).ToCairoColor ();
+
+			BaseForegroundColor =
+				style.Foreground (Gtk.StateType.Normal).ToCairoColor ();
+
+			IsDarkTheme = 
+				(BaseBackgroundColor.R +
+				 BaseBackgroundColor.G +
+				 BaseBackgroundColor.B) / 3.0 < 0.5;
+
+            TabBarActiveTextColor = IsDarkTheme ? new Cairo.Color (1, 1, 1) : new Cairo.Color (0, 0, 0);
+            PadBackground = IsDarkTheme ? new Gdk.Color (15, 15, 15) : new Gdk.Color (240, 240, 240);
+
+			widget.Destroy ();
+		}
 
 		// General
 
-		public static readonly Gdk.Color ThinSplitterColor = new Gdk.Color (166, 166, 166);
+		public static readonly Gdk.Color ThinSplitterColor = Darken (BaseBackgroundColor, 0.18).ToGdkColor ();
 
 		// Document tab bar
+		public static readonly Cairo.Color TabBarBackgroundColor = BaseBackgroundColor;
+		public static Cairo.Color TabBarActiveTextColor { get; private set; }
 
-
-		public static readonly Cairo.Color TabBarBackgroundColor = CairoExtensions.ParseColor ("c2c2c2");
-		public static readonly Cairo.Color TabBarActiveTextColor = new Cairo.Color (0, 0, 0);
-
-		public static readonly Cairo.Color TabBarActiveGradientStartColor = Shift (TabBarBackgroundColor, 0.92);
+		public static readonly Cairo.Color TabBarActiveGradientStartColor = IsDarkTheme ? Lighten (TabBarBackgroundColor, 0.04) : Darken (TabBarBackgroundColor, 0.03);
 		public static readonly Cairo.Color TabBarActiveGradientEndColor = TabBarBackgroundColor;
-		public static readonly Cairo.Color TabBarGradientStartColor = Shift (TabBarBackgroundColor, 1.02);
+		public static readonly Cairo.Color TabBarGradientStartColor = IsDarkTheme ? Lighten (TabBarBackgroundColor, 0.02) : Lighten (TabBarBackgroundColor, 0.01);
 		public static readonly Cairo.Color TabBarGradientEndColor = TabBarBackgroundColor;
-		public static readonly Cairo.Color TabBarGradientShadowColor = Shift (TabBarBackgroundColor, 0.8);
-		public static readonly Cairo.Color TabBarHoverActiveTextColor = TabBarActiveTextColor;
-		public static readonly Cairo.Color TabBarInactiveTextColor = Blend (new Cairo.Color (0, 0, 0), TabBarGradientStartColor, 0.4);
-		public static readonly Cairo.Color TabBarHoverInactiveTextColor = new Cairo.Color (0, 0, 0);
+		public static readonly Cairo.Color TabBarGradientShadowColor = IsDarkTheme ? Darken (TabBarBackgroundColor, 0.12) : Darken (TabBarBackgroundColor, 0.08);
+		public static readonly Cairo.Color TabBarHoverActiveTextColor = BaseForegroundColor;
+		public static readonly Cairo.Color TabBarInactiveTextColor = Blend (BaseForegroundColor, BaseBackgroundColor, IsDarkTheme ? 0.25 : 0.4);
+		public static readonly Cairo.Color TabBarHoverInactiveTextColor = BaseForegroundColor;
 
-		public static readonly Cairo.Color BreadcrumbGradientStartColor = CairoExtensions.ParseColor ("FFFFFF");
-		public static readonly Cairo.Color BreadcrumbBackgroundColor = Shift (BreadcrumbGradientStartColor, .95);
-		public static readonly Cairo.Color BreadcrumbGradientEndColor = Shift (BreadcrumbGradientStartColor, 0.9);
-		public static readonly Cairo.Color BreadcrumbBorderColor = Shift (BreadcrumbBackgroundColor, 0.6);
-		public static readonly Cairo.Color BreadcrumbInnerBorderColor = WithAlpha (BaseBackgroundColor, 0.1d);
-		public static readonly Gdk.Color BreadcrumbTextColor = Shift (BaseForegroundColor, 0.8).ToGdkColor ();
-		public static readonly Cairo.Color BreadcrumbButtonBorderColor = Shift (BaseBackgroundColor, 0.8);
-		public static readonly Cairo.Color BreadcrumbButtonFillColor = WithAlpha (BaseBackgroundColor, 0.1d);
-		public static readonly Cairo.Color BreadcrumbBottomBorderColor = Shift (BreadcrumbBackgroundColor, 0.7d);
+		public static readonly Cairo.Color BreadcrumbGradientStartColor = TabBarBackgroundColor;
+		public static readonly Cairo.Color BreadcrumbInactiveGradientStartColor = TabBarBackgroundColor;
+		public static readonly Cairo.Color BreadcrumbBackgroundColor = IsDarkTheme ? Darken (BaseBackgroundColor, 0.04) : Lighten (BaseBackgroundColor, 0.01);
+		public static readonly Cairo.Color BreadcrumbGradientEndColor = BreadcrumbBackgroundColor;
+		public static readonly Cairo.Color BreadcrumbBorderColor = Darken (BreadcrumbBackgroundColor, 0.15);
+		public static readonly Cairo.Color BreadcrumbInnerBorderColor = WithAlpha (BaseForegroundColor, IsDarkTheme ? 0.04 : 0.08);
+		public static readonly Gdk.Color BreadcrumbTextColor = BaseForegroundColor.ToGdkColor ();
+		public static readonly Cairo.Color BreadcrumbButtonBorderColor = Darken (BreadcrumbBackgroundColor, 0.1);
+		public static readonly Cairo.Color BreadcrumbButtonFillColor = WithAlpha (BaseForegroundColor, 0.03);
+		public static readonly Cairo.Color BreadcrumbBottomBorderColor = Darken (BreadcrumbBackgroundColor, 0.18);
 		public static readonly bool BreadcrumbInvertedIcons = false;
 		public static readonly bool BreadcrumbGreyscaleIcons = false;
 
 		// Dock pads
 		
-		public static readonly Cairo.Color DockTabBarGradientTop = new Cairo.Color (248d / 255d, 248d / 255d, 248d / 255d);
-		public static readonly Cairo.Color DockTabBarGradientStart = new Cairo.Color (242d / 255d, 242d / 255d, 242d / 255d);
-		public static readonly Cairo.Color DockTabBarGradientEnd = new Cairo.Color (230d / 255d, 230d / 255d, 230d / 255d);
-		public static readonly Cairo.Color DockTabBarShadowGradientStart = new Cairo.Color (154d / 255d, 154d / 255d, 154d / 255d, 1);
-		public static readonly Cairo.Color DockTabBarShadowGradientEnd = new Cairo.Color (154d / 255d, 154d / 255d, 154d / 255d, 0);
+		public static readonly Cairo.Color DockTabBarGradientTop = IsDarkTheme ? Lighten (BaseBackgroundColor, 0.02) : Lighten (BaseBackgroundColor, 0.01);
+		public static readonly Cairo.Color DockTabBarGradientStart = BaseBackgroundColor;
+		public static readonly Cairo.Color DockTabBarGradientEnd = IsDarkTheme ? Darken (BaseBackgroundColor, 0.03) : Darken (BaseBackgroundColor, 0.02);
+		public static readonly Cairo.Color DockTabBarShadowGradientStart = new Cairo.Color (0, 0, 0, IsDarkTheme ? 0.22 : 0.12);
+		public static readonly Cairo.Color DockTabBarShadowGradientEnd = new Cairo.Color (0, 0, 0, 0);
 
-		public static readonly Gdk.Color PadBackground = new Gdk.Color (240, 240, 240);
-		public static readonly Gdk.Color InactivePadBackground = ReduceLight (PadBackground, 0.9);
-		public static readonly Gdk.Color PadLabelColor = new Gdk.Color (92, 99, 102);
-		public static readonly Gdk.Color DockFrameBackground = new Gdk.Color (157, 162, 166);
+		public static Gdk.Color PadBackground { get; private set; }
+		public static readonly Gdk.Color InactivePadBackground = IsDarkTheme ? Darken (BaseBackgroundColor, 0.03).ToGdkColor () : Darken (BaseBackgroundColor, 0.02).ToGdkColor ();
+		public static readonly Gdk.Color PadLabelColor = BaseForegroundColor.ToGdkColor ();
+		public static readonly Gdk.Color DockFrameBackground = Darken (BaseBackgroundColor, 0.1).ToGdkColor ();
 		public static readonly Gdk.Color DockSeparatorColor = ThinSplitterColor;
 
-		public static readonly Gdk.Color BrowserPadBackground = new Gdk.Color (225, 228, 232);
-		public static readonly Gdk.Color InactiveBrowserPadBackground = new Gdk.Color (240, 240, 240);
+		public static readonly Gdk.Color BrowserPadBackground = PadBackground;
+		public static readonly Gdk.Color InactiveBrowserPadBackground = InactivePadBackground;
 
-		public static readonly Cairo.Color DockBarBackground1 = PadBackground.ToCairoColor ();
-		public static readonly Cairo.Color DockBarBackground2 = Shift (PadBackground.ToCairoColor (), 0.95);
-		public static readonly Cairo.Color DockBarSeparatorColorDark = new Cairo.Color (0, 0, 0, 0.2);
-		public static readonly Cairo.Color DockBarSeparatorColorLight = new Cairo.Color (1, 1, 1, 0.3);
-
-		public static readonly Cairo.Color DockBarPrelightColor = CairoExtensions.ParseColor ("ffffff");
+		public static readonly Cairo.Color DockBarBackground1 = BaseBackgroundColor;
+		public static readonly Cairo.Color DockBarBackground2 = IsDarkTheme ? Darken (BaseBackgroundColor, 0.02) : Lighten (BaseBackgroundColor, 0.01);
+		public static readonly Cairo.Color DockBarSeparatorColorDark = new Cairo.Color (0, 0, 0, IsDarkTheme ? 0.35 : 0.18);
+		public static readonly Cairo.Color DockBarSeparatorColorLight = new Cairo.Color (1, 1, 1, IsDarkTheme ? 0.06 : 0.22);
+		public static readonly Cairo.Color DockBarPrelightColor = WithAlpha (BaseForegroundColor, IsDarkTheme ? 0.05 : 0.08);
 
 		// Status area
+		public static readonly Cairo.Color WidgetBorderColor = Darken (BaseBackgroundColor, 0.18);
 
-		public static readonly Cairo.Color WidgetBorderColor = CairoExtensions.ParseColor ("8c8c8c");
+		public static readonly Cairo.Color StatusBarBorderColor = Darken (BaseBackgroundColor, 0.12);
 
-		public static readonly Cairo.Color StatusBarBorderColor = CairoExtensions.ParseColor ("919191");
-
-		public static readonly Cairo.Color StatusBarFill1Color = CairoExtensions.ParseColor ("f5fafc");
-		public static readonly Cairo.Color StatusBarFill2Color = CairoExtensions.ParseColor ("e9f1f3");
-		public static readonly Cairo.Color StatusBarFill3Color = CairoExtensions.ParseColor ("d8e7ea");
-		public static readonly Cairo.Color StatusBarFill4Color = CairoExtensions.ParseColor ("d1e3e7");
+		public static readonly Cairo.Color StatusBarFill1Color = BaseBackgroundColor;
+		public static readonly Cairo.Color StatusBarFill2Color = IsDarkTheme ? Darken (BaseBackgroundColor, 0.01) : Lighten (BaseBackgroundColor, 0.01);
+		public static readonly Cairo.Color StatusBarFill3Color = IsDarkTheme ? Darken (BaseBackgroundColor, 0.02) : Lighten (BaseBackgroundColor, 0.02);
+		public static readonly Cairo.Color StatusBarFill4Color = IsDarkTheme ? Darken (BaseBackgroundColor, 0.03) : Lighten (BaseBackgroundColor, 0.03);
 
 		public static readonly Cairo.Color StatusBarErrorColor = CairoExtensions.ParseColor ("FF6363");
 
 		public static readonly Cairo.Color StatusBarInnerColor = new Cairo.Color (0,0,0, 0.08);
 		public static readonly Cairo.Color StatusBarShadowColor1 = new Cairo.Color (0,0,0, 0.06);
 		public static readonly Cairo.Color StatusBarShadowColor2 = new Cairo.Color (0,0,0, 0.02);
-		public static readonly Cairo.Color StatusBarTextColor = CairoExtensions.ParseColor ("555555");
+		public static readonly Cairo.Color StatusBarTextColor = BaseForegroundColor;
 		public static readonly Cairo.Color StatusBarProgressBackgroundColor = new Cairo.Color (0, 0, 0, 0.1);
 		public static readonly Cairo.Color StatusBarProgressOutlineColor = new Cairo.Color (0, 0, 0, 0.1);
 
@@ -204,6 +228,16 @@ namespace Pinta.Docking
 		{
 			return IncreaseLight (color.ToCairoColor (), factor).ToGdkColor ();
 		}
+        
+        internal static Cairo.Color Lighten (Cairo.Color color, double amount)
+        {
+            return IncreaseLight (color, amount);
+        }
+
+        internal static Cairo.Color Darken (Cairo.Color color, double amount)
+        {
+            return ReduceLight (color, 1.0 - amount);
+        }
 	}
 }
 
