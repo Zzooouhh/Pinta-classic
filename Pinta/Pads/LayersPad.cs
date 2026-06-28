@@ -53,7 +53,7 @@ namespace Pinta
 			layers_tb.Add (PintaCore.Actions.Layers.MoveLayerUp.CreateDockToolBarItem ());
 			layers_tb.Add (PintaCore.Actions.Layers.MoveLayerDown.CreateDockToolBarItem ());
 
-			Gtk.ToggleAction show_layers = padMenu.AppendToggleAction ("Layers", Catalog.GetString ("Layers"), null, "Menu.Layers.MergeLayerDown.png");
+			Gtk.ToggleAction show_layers = padMenu.AppendToggleAction ("Layers", Catalog.GetString ("_Layers"), null, "Menu.Layers.MergeLayerDown.png");
 			show_layers.Activated += delegate { layers_item.Visible = show_layers.Active; };
 			layers_item.VisibleChanged += delegate { show_layers.Active = layers_item.Visible; };
 

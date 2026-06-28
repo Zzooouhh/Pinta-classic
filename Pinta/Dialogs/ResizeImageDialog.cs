@@ -33,6 +33,7 @@ namespace Pinta
 {
 	public class ResizeImageDialog : Dialog
 	{
+        private ComboBox resample_combo;
 		private RadioButton percentageRadio;
 		private RadioButton absoluteRadio;
 		private SpinButton percentageSpinner;
@@ -41,6 +42,7 @@ namespace Pinta
 		private CheckButton aspectCheckbox;
 
 		private bool value_changing;
+        private const string ResamplingSetting = "ResamplingType";
 		
 		public ResizeImageDialog () : base (Catalog.GetString ("Resize Image"), PintaCore.Chrome.MainWindow,
 		                                    DialogFlags.Modal,
@@ -76,7 +78,7 @@ namespace Pinta
 		#region Public Methods
 		public void SaveChanges ()
 		{
-			PintaCore.Workspace.ResizeImage (widthSpinner.ValueAsInt, heightSpinner.ValueAsInt);
+			PintaCore.Workspace.ResizeImage (widthSpinner.ValueAsInt, heightSpinner.ValueAsInt, this.ResamplingFilter);
 		}
 		#endregion
 		
@@ -158,6 +160,49 @@ namespace Pinta
 			const int spacing = 6;
 			var main_vbox = new VBox () { Spacing = spacing, BorderWidth = 12 };
 
+            Label resample_label = new Label (Catalog.GetString ("Resampling:"));
+            resample_label.Xalign = 0;
+            resample_label.Xpad = 5;
+
+            resample_combo = new ComboBox ();
+
+            // Create a ListStore to hold the text (Display) and the ID (for logic)
+            var resample_store = new ListStore (typeof (string), typeof (string));
+
+            // Add Options (Format: DisplayText, InternalID)
+            resample_store.AppendValues (Catalog.GetString ("Bicubic (Best)"), "Best");
+            resample_store.AppendValues (Catalog.GetString ("Bilinear (Good)"), "Good");
+            resample_store.AppendValues (Catalog.GetString ("Nearest Neighbor (Fast)"), "Fast");
+
+            resample_combo.Model = resample_store;
+
+            CellRendererText cell = new CellRendererText ();
+            resample_combo.PackStart (cell, false);
+            resample_combo.AddAttribute (cell, "text", 0);
+
+            resample_combo.Active = 0; // Set Default to "Bicubic" (index 0)
+
+            var hbox_resample = new HBox () { Spacing = spacing };
+            hbox_resample.PackStart (resample_label, true, true, 0); // True = Expand
+            hbox_resample.PackStart (resample_combo, false, false, 0);
+
+            main_vbox.PackStart (hbox_resample, false, false, 0);
+
+            // Get the saved ID string (Default to "Best" for Bicubic)
+            string savedId = PintaCore.Settings.GetSetting (ResamplingSetting, "Best");
+
+            // Iterate through the ComboBox model to find the matching ID
+            TreeIter iter;
+            if (resample_combo.Model.GetIterFirst (out iter)) {
+                do {
+                    string id = (string)resample_combo.Model.GetValue (iter, 1);
+                    if (id == savedId) {
+                        resample_combo.SetActiveIter (iter);
+                        break;
+                    }
+                } while (resample_combo.Model.IterNext (ref iter));
+            }
+
 			var hbox_percent = new HBox () { Spacing = spacing };
 			hbox_percent.PackStart (percentageRadio, true, true, 0);
 			hbox_percent.PackStart (percentageSpinner, false, false, 0);
@@ -185,6 +230,45 @@ namespace Pinta
 
 			ShowAll ();
 		}
+        
+        protected override void OnResponse (ResponseType type)
+        {
+            base.OnResponse (type); // Ensure default close logic runs
+
+            if (type == ResponseType.Ok) {
+                // Get the active item's ID
+                Gtk.TreeIter iter;
+                if (resample_combo.GetActiveIter (out iter)) {
+                    string id = (string)resample_combo.Model.GetValue (iter, 1);
+
+                    // Save it to Settings
+                    PintaCore.Settings.PutSetting (ResamplingSetting, id);
+                }
+            }
+        }
+        
+        public Cairo.Filter ResamplingFilter {
+            get {
+                if (resample_combo == null || resample_combo.Active < 0)
+                    return Cairo.Filter.Best; // Fallback to Bicubic
+
+                Gtk.TreeIter iter;
+                if (resample_combo.GetActiveIter (out iter)) {
+                    string id = (string)resample_combo.Model.GetValue (iter, 1);
+
+                    switch (id) {
+                        case "Fast": // Nearest Neighbor
+                            return Cairo.Filter.Fast;
+                        case "Good": // Bilinear
+                            return Cairo.Filter.Good;
+                        case "Best": // Bicubic
+                        default:
+                            return Cairo.Filter.Best;
+                    }
+                }
+                return Cairo.Filter.Best; // Fallback
+            }
+        }
 		#endregion
 	}
 }

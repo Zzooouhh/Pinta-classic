@@ -49,7 +49,7 @@ namespace Pinta
 
 			history_tb.Add (PintaCore.Actions.Edit.Undo.CreateDockToolBarItem ());
 			history_tb.Add (PintaCore.Actions.Edit.Redo.CreateDockToolBarItem ());
-			Gtk.ToggleAction show_history = padMenu.AppendToggleAction ("History", Catalog.GetString ("History"), null, "Menu.Layers.DuplicateLayer.png");
+			Gtk.ToggleAction show_history = padMenu.AppendToggleAction ("History", Catalog.GetString ("_History"), null, "Menu.Layers.DuplicateLayer.png");
 			show_history.Activated += delegate { history_item.Visible = show_history.Active; };
 			history_item.VisibleChanged += delegate { show_history.Active = history_item.Visible; };
 

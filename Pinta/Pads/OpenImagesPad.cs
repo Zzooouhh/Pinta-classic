@@ -45,7 +45,7 @@ namespace Pinta
             open_images_item.DefaultWidth = 100;
 			open_images_item.Behavior |= DockItemBehavior.CantClose;
 
-			ToggleAction show_open_images = padMenu.AppendToggleAction ("Images", Catalog.GetString ("Images"), null, null);
+			ToggleAction show_open_images = padMenu.AppendToggleAction ("Images", Catalog.GetString ("_Images"), null, null);
 
 			show_open_images.Activated += delegate {
 				open_images_item.Visible = show_open_images.Active;

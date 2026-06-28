@@ -98,5 +98,17 @@ namespace Pinta
 		{
 			Gtk.Drag.DestSet (this, Gtk.DestDefaults.Motion | Gtk.DestDefaults.Highlight | Gtk.DestDefaults.Drop, entries, Gdk.DragAction.Copy);
 		}
+		
+		public void CollapseMenuBar ()
+		{
+			main_menu.SetSizeRequest (-1, 0);
+			QueueResize ();
+		}
+
+		public void ExpandMenuBar ()
+		{
+			main_menu.SetSizeRequest (-1, -1);
+			QueueResize ();
+		}
 	}
 }
