@@ -42,7 +42,16 @@ namespace Pinta.Tools
 		
 		protected ImageSurface undo_surface;
 		protected bool surface_modified;
-		protected uint mouse_button;
+
+        // CHANGE private TO protected for these three:
+        protected PointD start_point_drawing;
+        protected Gdk.Rectangle last_invalidated_rect;
+        protected bool was_shift_held = false;
+
+        // These stay private/static as they don't need to be accessed directly by derived tools
+        protected static bool is_shift_down = false;
+        protected static bool is_ctrl_down = false;
+        private static bool handlers_attached = false;
 
 		protected override bool ShowAntialiasingButton { get { return true; } }
 	    
@@ -101,16 +110,92 @@ namespace Pinta.Tools
 		
 		protected virtual void MinusButtonClickedEvent (object o, EventArgs args)
 		{
-			if (BrushWidth > 1)
-				BrushWidth--;
-		}
+            bool shiftHeld = false;
+            Gdk.Event ev = Gtk.Global.CurrentEvent;
+            if (ev != null && ev.Type == Gdk.EventType.ButtonRelease) {
+                Gdk.EventButton btn = (Gdk.EventButton)ev;
+                if ((btn.State & Gdk.ModifierType.ShiftMask) != 0) {
+                    shiftHeld = true;
+                }
+            }
+
+            int change = shiftHeld ? 5 : 1;
+            int newVal = BrushWidth - change;
+            if (newVal < 1) newVal = 1;
+            
+            BrushWidth = newVal;
+        }
 		
 		protected virtual void PlusButtonClickedEvent (object o, EventArgs args)
 		{
-			BrushWidth++;
-		}
+            bool shiftHeld = false;
+            Gdk.Event ev = Gtk.Global.CurrentEvent;
+            if (ev != null && ev.Type == Gdk.EventType.ButtonRelease) {
+                Gdk.EventButton btn = (Gdk.EventButton)ev;
+                if ((btn.State & Gdk.ModifierType.ShiftMask) != 0) {
+                    shiftHeld = true;
+                }
+            }
+
+            int change = shiftHeld ? 5 : 1;
+            int newVal = BrushWidth + change;
+            
+            BrushWidth = newVal;
+        }
 		#endregion
-		
+
+		#region Key Handlers
+        
+        protected override void OnKeyDown(Gtk.DrawingArea canvas, Gtk.KeyPressEventArgs args)
+        {
+			Gdk.Key keyPressed = args.Event.Key;
+
+            if (keyPressed == Gdk.Key.A && (args.Event.State & Gdk.ModifierType.ControlMask) != 0) // ctrl + shift + A = toggle antialiasing
+            {
+                var tool = PintaCore.Tools.CurrentTool;
+                if (tool != null)
+                    tool.UseAntialiasing = !tool.UseAntialiasing;
+                args.RetVal = true;
+            }
+            else if (keyPressed == Gdk.Key.bracketleft || keyPressed == Gdk.Key.braceleft)
+            {
+                if ((args.Event.State & Gdk.ModifierType.ShiftMask) == Gdk.ModifierType.ShiftMask)
+                    if (BrushWidth > 5)
+                        BrushWidth -= 5;
+                    else
+                        BrushWidth = 1;
+                else if (BrushWidth > 1)
+                        BrushWidth--;
+                args.RetVal = true;
+            }
+            else if (keyPressed == Gdk.Key.bracketright || keyPressed == Gdk.Key.braceright)
+            {
+                if ((args.Event.State & Gdk.ModifierType.ShiftMask) == Gdk.ModifierType.ShiftMask)
+                    BrushWidth += 5;
+                else
+                    BrushWidth++;
+                args.RetVal = true;
+            }
+            else
+            {
+                base.OnKeyDown(canvas, args);
+            }
+        }
+
+        protected override void OnKeyUp(Gtk.DrawingArea canvas, Gtk.KeyReleaseEventArgs args)
+        {
+			Gdk.Key keyReleased = args.Event.Key;
+            if (keyReleased == Gdk.Key.bracketleft || keyReleased == Gdk.Key.bracketright)
+            {
+                args.RetVal = true;
+            }
+            else
+            {
+                base.OnKeyUp(canvas, args);
+            }
+        }
+		#endregion
+
 		#region Mouse Handlers
 		protected override void OnMouseUp (Gtk.DrawingArea canvas, Gtk.ButtonReleaseEventArgs args, Cairo.PointD point)
 		{
@@ -126,6 +211,10 @@ namespace Pinta.Tools
 			surface_modified = false;
 			undo_surface = null;
 			mouse_button = 0;
+            
+            // Cleanup
+            last_invalidated_rect = Gdk.Rectangle.Zero;
+            was_shift_held = false;
 		}
 		
 		protected override void OnMouseDown (Gtk.DrawingArea canvas, Gtk.ButtonPressEventArgs args, Cairo.PointD point)
@@ -140,6 +229,10 @@ namespace Pinta.Tools
 			undo_surface = doc.CurrentUserLayer.Surface.Clone ();
 			mouse_button = args.Event.Button;
 			
+            start_point_drawing = point;
+            last_invalidated_rect = Gdk.Rectangle.Zero;
+            was_shift_held = is_shift_down; // Sync with current static state
+            
 			OnMouseMove (canvas, null, point);
 		}
 		#endregion

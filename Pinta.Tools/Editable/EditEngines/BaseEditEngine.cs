@@ -241,17 +241,37 @@ namespace Pinta.Tools
 
         protected virtual void BrushMinusButtonClickedEvent(object o, EventArgs args)
         {
-            if (BrushWidth > 1)
-                BrushWidth--;
+            bool shiftHeld = false;
+            Gdk.Event ev = Gtk.Global.CurrentEvent;
+            if (ev != null && ev.Type == Gdk.EventType.ButtonRelease) {
+                Gdk.EventButton btn = (Gdk.EventButton)ev;
+                if ((btn.State & Gdk.ModifierType.ShiftMask) != 0) {
+                    shiftHeld = true;
+                }
+            }
 
-			//No need to store previous settings or redraw, as this is done in the Changed event handler.
+            int change = shiftHeld ? 5 : 1;
+            int newVal = BrushWidth - change;
+            if (newVal < 1) newVal = 1;
+            
+            BrushWidth = newVal;
         }
 
         protected virtual void BrushPlusButtonClickedEvent(object o, EventArgs args)
         {
-            BrushWidth++;
+            bool shiftHeld = false;
+            Gdk.Event ev = Gtk.Global.CurrentEvent;
+            if (ev != null && ev.Type == Gdk.EventType.ButtonRelease) {
+                Gdk.EventButton btn = (Gdk.EventButton)ev;
+                if ((btn.State & Gdk.ModifierType.ShiftMask) != 0) {
+                    shiftHeld = true;
+                }
+            }
 
-			//No need to store previous settings or redraw, as this is done in the Changed event handler.
+            int change = shiftHeld ? 5 : 1;
+            int newVal = BrushWidth + change;
+            
+            BrushWidth = newVal;
         }
 
 		protected void Palette_PrimaryColorChanged(object sender, EventArgs e)
@@ -513,7 +533,6 @@ namespace Pinta.Tools
         public virtual bool HandleKeyDown(Gtk.DrawingArea canvas, Gtk.KeyPressEventArgs args)
         {
 			Gdk.Key keyPressed = args.Event.Key;
-
 			if (keyPressed == Gdk.Key.Delete)
             {
                 if (SelectedPointIndex > -1)
@@ -562,8 +581,14 @@ namespace Pinta.Tools
 						//Redraw the workspace.
 						doc.Workspace.Invalidate();
 
-                        SelectedPointIndex = -1;
-						SelectedShapeIndex = -1;
+						if (SelectedShapeIndex > 0) {
+							SelectedPointIndex = 0;
+							if (SEngines.Count - 1 < SelectedShapeIndex)
+								--SelectedShapeIndex;
+						} else {
+							SelectedPointIndex = -1;
+							SelectedShapeIndex = -1;
+						}
                     }
 
                     hover_point = new PointD(-1d, -1d);
@@ -573,7 +598,57 @@ namespace Pinta.Tools
 
                 args.RetVal = true;
             }
-            else if (keyPressed == Gdk.Key.Return)
+			else if (keyPressed == Gdk.Key.Page_Up)
+            {
+                if (SelectedPointIndex > -1)
+                {
+					bool shiftKey = (args.Event.State & Gdk.ModifierType.ShiftMask) == Gdk.ModifierType.ShiftMask;
+					if (shiftKey) {
+						if (SelectedShapeIndex > 0) {
+							DrawActiveShape(true, false, false, false, false);
+							SelectedPointIndex = 0;
+							--SelectedShapeIndex;
+						}
+					} else {
+						--SelectedPointIndex;
+
+                        if (SelectedPointIndex < 0)
+                        {
+							ShapeEngine activeEngine = ActiveShapeEngine;
+							if (activeEngine != null)
+								SelectedPointIndex = activeEngine.ControlPoints.Count - 1;
+                        }
+					}
+					DrawActiveShape(true, false, true, false, false);
+				}
+                args.RetVal = true;
+			}
+			else if (keyPressed == Gdk.Key.Page_Down)
+            {
+                if (SelectedPointIndex > -1)
+                {
+					bool shiftKey = (args.Event.State & Gdk.ModifierType.ShiftMask) == Gdk.ModifierType.ShiftMask;
+					if (shiftKey) {
+						if (SelectedShapeIndex < SEngines.Count - 1) {
+							DrawActiveShape(true, false, false, false, false);
+							SelectedPointIndex = 0;
+							++SelectedShapeIndex;
+						}
+					} else {
+						++SelectedPointIndex;
+						
+						ShapeEngine activeEngine = ActiveShapeEngine;
+						if (activeEngine != null)
+						{
+							if (SelectedPointIndex > activeEngine.ControlPoints.Count - 1)
+								SelectedPointIndex = 0;
+						}
+					}
+					DrawActiveShape(true, false, true, false, false);
+				}
+                args.RetVal = true;
+			}
+            else if (keyPressed == Gdk.Key.Return || keyPressed == Gdk.Key.KP_Enter || keyPressed == Gdk.Key.Escape)
             {
                 //Finalize every editable shape not yet finalized.
 				FinalizeAllShapes();
@@ -642,7 +717,8 @@ namespace Pinta.Tools
                 if (SelectedPointIndex > -1)
                 {
                     //Move the selected control point.
-                    SelectedPoint.Position.Y -= 1d;
+                    bool ctrlKey = (args.Event.State & Gdk.ModifierType.ControlMask) == Gdk.ModifierType.ControlMask;
+                    SelectedPoint.Position.Y -= ctrlKey ? 10d : 1d;
 
 					DrawActiveShape(true, false, true, false, false);
                 }
@@ -655,7 +731,8 @@ namespace Pinta.Tools
                 if (SelectedPointIndex > -1)
                 {
                     //Move the selected control point.
-                    SelectedPoint.Position.Y += 1d;
+                    bool ctrlKey = (args.Event.State & Gdk.ModifierType.ControlMask) == Gdk.ModifierType.ControlMask;
+                    SelectedPoint.Position.Y += ctrlKey ? 10d : 1d;
 
 					DrawActiveShape(true, false, true, false, false);
                 }
@@ -667,27 +744,9 @@ namespace Pinta.Tools
                 //Make sure a control point is selected.
                 if (SelectedPointIndex > -1)
                 {
-                    if ((args.Event.State & Gdk.ModifierType.ControlMask) == Gdk.ModifierType.ControlMask)
-                    {
-                        //Change the selected control point to be the previous one.
-						
-						--SelectedPointIndex;
-
-                        if (SelectedPointIndex < 0)
-                        {
-							ShapeEngine activeEngine = ActiveShapeEngine;
-
-							if (activeEngine != null)
-							{
-								SelectedPointIndex = activeEngine.ControlPoints.Count - 1;
-							}
-                        }
-                    }
-                    else
-                    {
-                        //Move the selected control point.
-                        SelectedPoint.Position.X -= 1d;
-                    }
+					//Move the selected control point.
+					bool ctrlKey = (args.Event.State & Gdk.ModifierType.ControlMask) == Gdk.ModifierType.ControlMask;
+					SelectedPoint.Position.X -= ctrlKey ? 10d : 1d;
 
 					DrawActiveShape(true, false, true, false, false);
                 }
@@ -699,38 +758,45 @@ namespace Pinta.Tools
                 //Make sure a control point is selected.
                 if (SelectedPointIndex > -1)
                 {
-                    if ((args.Event.State & Gdk.ModifierType.ControlMask) == Gdk.ModifierType.ControlMask)
-                    {
-						//Change the selected control point to be the following one.
-
-						ShapeEngine activeEngine = ActiveShapeEngine;
-
-						if (activeEngine != null)
-						{
-							++SelectedPointIndex;
-
-							if (SelectedPointIndex > activeEngine.ControlPoints.Count - 1)
-							{
-								SelectedPointIndex = 0;
-							}
-						}
-                    }
-                    else
-                    {
-                        //Move the selected control point.
-                        SelectedPoint.Position.X += 1d;
-                    }
+					//Move the selected control point.
+					bool ctrlKey = (args.Event.State & Gdk.ModifierType.ControlMask) == Gdk.ModifierType.ControlMask;
+					SelectedPoint.Position.X += ctrlKey ? 10d : 1d;
 
 					DrawActiveShape(true, false, true, false, false);
                 }
 
                 args.RetVal = true;
             }
+            else if (keyPressed == Gdk.Key.A && (args.Event.State & Gdk.ModifierType.ControlMask) != 0) // ctrl + shift + A = toggle antialiasing
+            {
+                var tool = PintaCore.Tools.CurrentTool;
+                if (tool != null)
+                    tool.UseAntialiasing = !tool.UseAntialiasing;
+                args.RetVal = true;
+            }
+            else if (keyPressed == Gdk.Key.bracketleft || keyPressed == Gdk.Key.braceleft)
+            {
+                if ((args.Event.State & Gdk.ModifierType.ShiftMask) == Gdk.ModifierType.ShiftMask)
+                    if (BrushWidth > 5)
+                        BrushWidth -= 5;
+                    else
+                        BrushWidth = 1;
+                else if (BrushWidth > 1)
+                        BrushWidth--;
+                args.RetVal = true;
+            }
+            else if (keyPressed == Gdk.Key.bracketright || keyPressed == Gdk.Key.braceright)
+            {
+                if ((args.Event.State & Gdk.ModifierType.ShiftMask) == Gdk.ModifierType.ShiftMask)
+                    BrushWidth += 5;
+                else
+                    BrushWidth++;
+                args.RetVal = true;
+            }
             else
             {
                 return false;
             }
-
             return true;
         }
 
@@ -740,7 +806,8 @@ namespace Pinta.Tools
 
             if (keyReleased == Gdk.Key.Delete || keyReleased == Gdk.Key.Return || keyReleased == Gdk.Key.space
                 || keyReleased == Gdk.Key.Up || keyReleased == Gdk.Key.Down
-                || keyReleased == Gdk.Key.Left || keyReleased == Gdk.Key.Right)
+                || keyReleased == Gdk.Key.Left || keyReleased == Gdk.Key.Right
+                || keyReleased == Gdk.Key.bracketleft || keyReleased == Gdk.Key.bracketright)
             {
                 args.RetVal = true;
 
@@ -992,7 +1059,8 @@ namespace Pinta.Tools
         {
             Document doc = PintaCore.Workspace.ActiveDocument;
 
-            current_point = new PointD(Utility.Clamp(point.X, 0, doc.ImageSize.Width - 1), Utility.Clamp(point.Y, 0, doc.ImageSize.Height - 1));
+            // current_point = new PointD(Utility.Clamp(point.X, 0, doc.ImageSize.Width - 1), Utility.Clamp(point.Y, 0, doc.ImageSize.Height - 1));
+            current_point = point; // allow shapes to extend beyond the canvas edge
 
             bool shiftKey = (args.Event.State & Gdk.ModifierType.ShiftMask) == Gdk.ModifierType.ShiftMask;
 

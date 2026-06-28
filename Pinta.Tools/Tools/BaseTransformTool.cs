@@ -175,19 +175,20 @@ namespace Pinta.Tools
 
             double dx = 0.0;
             double dy = 0.0;
+            bool ctrlKey = (args.Event.State & Gdk.ModifierType.ControlMask) == Gdk.ModifierType.ControlMask;
 
             switch (args.Event.Key) {
             case Gdk.Key.Left:
-                dx = -1;
+                dx = ctrlKey ? -10 : -1;
                 break;
             case Gdk.Key.Right:
-                dx = 1;
+                dx = ctrlKey ? 10 : 1;
                 break;
             case Gdk.Key.Up:
-                dy = -1;
+                dy = ctrlKey ? -10 : -1;
                 break;
             case Gdk.Key.Down:
-                dy = 1;
+                dy = ctrlKey ? 10 : 1;
                 break;
             default:
                 // Otherwise, let the key be handled elsewhere.

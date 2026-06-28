@@ -743,7 +743,7 @@ namespace Pinta.Tools
 				switch (args.Event.Key)
 				{
 					case Gdk.Key.BackSpace:
-						CurrentTextEngine.PerformBackspace();
+						CurrentTextEngine.PerformBackspace((modifier & Gdk.ModifierType.ControlMask) != 0);
 						break;
 
 					case Gdk.Key.Delete:

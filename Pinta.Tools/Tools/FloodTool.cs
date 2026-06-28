@@ -44,17 +44,16 @@ namespace Pinta.Tools
 {
 	public abstract class FloodTool : BaseTool
 	{
-		protected ToolBarLabel mode_label;
-		protected ToolBarDropDownButton mode_button;
 		protected Gtk.ToolItem mode_sep;
 		protected ToolBarLabel tolerance_label;
 		protected ToolBarSlider tolerance_slider;
 		private bool limitToSelection = true;
 		
 		#region Protected Properties
-		protected bool IsContinguousMode { get { return (bool)mode_button.SelectedItem.Tag; } }
 		protected float Tolerance { get { return (float)(tolerance_slider.Slider.Value / 100); } }
 		protected virtual bool CalculatePolygonSet { get { return true; } }
+        
+        protected override bool ShowGlobalButton { get { return true; } }
 
 		protected bool LimitToSelection {
 			get { return limitToSelection; }
@@ -66,20 +65,6 @@ namespace Pinta.Tools
 		protected override void OnBuildToolBar (Gtk.Toolbar tb)
 		{
 			base.OnBuildToolBar (tb);
-
-			if (mode_label == null)
-				mode_label = new ToolBarLabel (string.Format (" {0}: ", Catalog.GetString ("Flood Mode")));
-
-			tb.AppendItem (mode_label);
-
-			if (mode_button == null) {
-				mode_button = new ToolBarDropDownButton ();
-
-				mode_button.AddItem (Catalog.GetString ("Contiguous"), "Tools.FreeformShape.png", true);
-				mode_button.AddItem (Catalog.GetString ("Global"), "Menu.Help.Website.png", false);
-			}
-
-			tb.AppendItem (mode_button);
 
 			if (mode_sep == null)
 				mode_sep = new Gtk.SeparatorToolItem ();
@@ -97,6 +82,47 @@ namespace Pinta.Tools
 			tb.AppendItem (tolerance_slider);
 		}
 		#endregion
+
+
+        protected override void OnKeyDown(Gtk.DrawingArea canvas, Gtk.KeyPressEventArgs args)
+        {
+			Gdk.Key keyPressed = args.Event.Key;
+
+            if ((args.Event.State & Gdk.ModifierType.ControlMask) != 0)
+            {
+                if (keyPressed == Gdk.Key.F) // ctrl + shift + F = toggle flood mode
+                {
+                    UseGlobalMode = !UseGlobalMode;
+                    args.RetVal = true;
+                    return;
+                }
+                else if (keyPressed == Gdk.Key.bracketleft || keyPressed == Gdk.Key.braceleft)
+                {
+                    if ((args.Event.State & Gdk.ModifierType.ShiftMask) == Gdk.ModifierType.ShiftMask)
+                        if (Tolerance > 0.10)
+                            tolerance_slider.Slider.Value -= 10;
+                        else
+                            tolerance_slider.Slider.Value = 0;
+                    else if (Tolerance > 0)
+                            tolerance_slider.Slider.Value--;
+                    args.RetVal = true;
+                    return;
+                }
+                else if (keyPressed == Gdk.Key.bracketright || keyPressed == Gdk.Key.braceright)
+                {
+                    if ((args.Event.State & Gdk.ModifierType.ShiftMask) == Gdk.ModifierType.ShiftMask)
+                        if (Tolerance < 0.9)
+                            tolerance_slider.Slider.Value += 10;
+                        else
+                            tolerance_slider.Slider.Value = 100;
+                    else if (Tolerance < 1)
+                            tolerance_slider.Slider.Value++;
+                    args.RetVal = true;
+                    return;
+                }
+            }
+            base.OnKeyDown(canvas, args);
+        }
 
 		#region Mouse Handlers
 		protected override void OnMouseDown (Gtk.DrawingArea canvas, Gtk.ButtonPressEventArgs args, PointD point)
@@ -128,10 +154,14 @@ namespace Pinta.Tools
 				int tol = (int)(Tolerance * Tolerance * 256);
 				Rectangle boundingBox;
 
-				if (IsContinguousMode)
-					FillStencilFromPoint (surface, stencilBuffer, pos, tol, out boundingBox, currentRegion, limitToSelection);
-				else
+				var ev = args != null ? args.Event : null;
+
+				bool shiftHeld = (args.Event.State & Gdk.ModifierType.ShiftMask) != 0;
+
+				if (UseGlobalMode != shiftHeld)
 					FillStencilByColor (surface, stencilBuffer, surface.GetColorBgraUnchecked (pos.X, pos.Y), tol, out boundingBox, currentRegion, LimitToSelection);
+				else
+					FillStencilFromPoint (surface, stencilBuffer, pos, tol, out boundingBox, currentRegion, limitToSelection);
 
 				OnFillRegionComputed (stencilBuffer);
 
