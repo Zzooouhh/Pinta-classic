@@ -293,6 +293,10 @@ namespace Pinta.Core
 
 			//Add the newly calculated elliptical Polygon.
 			SelectionPolygons.Add(newPolygon);
+
+			Origin = new PointD(r.X, r.Y);
+			End = new PointD(r.GetRight(), r.GetBottom());
+			
             MarkDirty ();
 		}
 

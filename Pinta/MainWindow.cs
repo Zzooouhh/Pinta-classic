@@ -42,11 +42,14 @@ namespace Pinta
 	public class MainWindow
 	{
 		WindowShell window_shell;
+		private MenuBar main_menu;
+		private bool menu_bar_temp_visible;
 		DockFrame dock;
 		Menu show_pad;
         DockNotebookContainer dock_container;
 
 		CanvasPad canvas_pad;
+		OpenImagesPad open_images_pad;
 
         bool suppress_active_notebook_change = false;
 
@@ -130,6 +133,8 @@ namespace Pinta
             DockNotebookManager.ActiveTabChanged += DockNotebook_ActiveTabChanged;
             DockNotebookManager.TabClosed += DockNotebook_TabClosed;
             DockNotebookManager.NotebookDragDataReceived += MainWindow_DragDataReceived;
+
+            Console.WriteLine ("*** Pinta-classic running ***");
         }
 
         private void Workspace_DocumentClosed (object sender, DocumentEventArgs e)
@@ -197,7 +202,6 @@ namespace Pinta
 
             // Find the currently active container for our new tab
             var container = DockNotebookManager.ActiveNotebookContainer ?? dock_container;
-            var selected_index = container.TabControl.CurrentTabIndex;
 
             var canvas = new CanvasWindow (doc) {
                 RulersVisible = PintaCore.Actions.View.Rulers.Active,
@@ -207,7 +211,10 @@ namespace Pinta
             var my_content = new DocumentViewContent (doc, canvas);
 
             // Insert our tab to the right of the currently selected tab
-            container.TabControl.InsertTab (my_content, selected_index + 1);
+            container.TabControl.InsertTab (my_content, -1);
+
+            container.TabControl.TabsReordered -= OnTabsReordered;
+			container.TabControl.TabsReordered += OnTabsReordered;
 
             doc.Workspace.Canvas = canvas.Canvas;
 
@@ -235,9 +242,100 @@ namespace Pinta
             return MetricType.Pixels;
         }
 
+		private void OnTabsReordered (DockNotebookTab tab, int oldIndex, int newIndex)
+		{
+			PintaCore.Workspace.ReorderDocument (oldIndex, newIndex);
+
+			PintaCore.Actions.Window.RefreshWindowMenu ();
+		}
+
 		[GLib.ConnectBefore]
 		private void MainWindow_KeyPressEvent (object o, KeyPressEventArgs e)
 		{
+			if (!PintaCore.Actions.View.MenuBar.Active) {
+				// Alt+Mnemonic to show menubar if set to hidden
+				if ((e.Event.State & Gdk.ModifierType.Mod1Mask) != 0) {
+					ShowTemporaryMenuBar ();
+
+					e.RetVal = false;
+					return;
+				}
+
+				// Escape to collapse menubar if set to hidden and visible
+				if (e.Event.Key == Gdk.Key.Escape && menu_bar_temp_visible) {
+					HideTemporaryMenuBar ();
+
+					e.RetVal = false;
+					return;
+				}
+			}
+
+			// Ctrl+(Shift)+Tab and Ctrl+PageUp/PageDown to cycle tabs, Ctrl+Shift+PageUp/PageDown to move tabs
+			// exclude Alt to not interfere with accels
+			if ((e.Event.State & Gdk.ModifierType.ControlMask) != 0 && (e.Event.State & Gdk.ModifierType.Mod1Mask) == 0) {
+				if (e.Event.Key == Gdk.Key.Page_Up || e.Event.Key == Gdk.Key.Page_Down || 
+					e.Event.Key == Gdk.Key.Tab || e.Event.Key == Gdk.Key.ISO_Left_Tab) {
+
+					bool reverse = e.Event.Key == Gdk.Key.Page_Up || 
+						((e.Event.Key == Gdk.Key.Tab && (e.Event.State & Gdk.ModifierType.ShiftMask) != 0) || e.Event.Key == Gdk.Key.ISO_Left_Tab);
+					bool moveTab = (e.Event.Key == Gdk.Key.Page_Up || e.Event.Key == Gdk.Key.Page_Down) && 
+						(e.Event.State & Gdk.ModifierType.ShiftMask) != 0;
+
+					var docs = PintaCore.Workspace.OpenDocuments;
+					if (docs != null && docs.Count > 1) {
+						int currentIdx = -1;
+
+						// Find active index
+						for (int i = 0; i < docs.Count; i++) {
+							if (docs[i] == PintaCore.Workspace.ActiveDocument) {
+								currentIdx = i;
+								break;
+							}
+						}
+
+						if (currentIdx != -1) {
+							int nextIdx = reverse ? (currentIdx - 1 + docs.Count) % docs.Count : (currentIdx + 1) % docs.Count;
+							if (moveTab) {
+								// Reorder tabs
+								var notebook = DockNotebookManager.ActiveNotebookContainer?.TabControl;
+
+								if (notebook != null) {
+									var currentTab = notebook.CurrentTab;
+									var targetTab = notebook.Tabs[nextIdx];
+
+									notebook.ReorderTab(currentTab, targetTab);
+								}
+							} else {
+								// Switch tabs
+								PintaCore.Workspace.SetActiveDocument (docs[nextIdx]);
+							}
+						}
+					}
+					e.RetVal = true;
+					return;
+				}
+			}
+
+			if (PintaCore.Tools.CurrentTool != null) {
+				string toolName = PintaCore.Tools.CurrentTool.Name;
+				bool isSelectionTool = (toolName.Contains ("Select") || toolName.Contains ("Lasso") || toolName.Contains ("Magic Wand"));
+
+				if (isSelectionTool) {
+					// Check for Arrow Keys
+					if (e.Event.Key == Gdk.Key.Up || e.Event.Key == Gdk.Key.Down || 
+						e.Event.Key == Gdk.Key.Left || e.Event.Key == Gdk.Key.Right) {
+
+						// Pass to Tool (Nudge)
+						var canvas_window = ((PintaCanvas)PintaCore.Workspace.ActiveWorkspace.Canvas).CanvasWindow;
+						canvas_window.Canvas.DoKeyPressEvent (o, e);
+
+                        // Stop Propagation (Prevent Dock Navigation)
+                        e.RetVal = true;
+                        return; 
+                    }
+                }
+            }
+
             // Give the widget that has focus a first shot at handling the event.
             // Otherwise, key presses may be intercepted by shortcuts for menu items.
             if (SendToFocusWidget (e, e.Event))
@@ -270,6 +368,17 @@ namespace Pinta
 		{
             if (SendToFocusWidget (e, e.Event) || !PintaCore.Workspace.HasOpenDocuments)
                 return;
+
+			if (e.Event.Key == Gdk.Key.Alt_L ||	e.Event.Key == Gdk.Key.Alt_R) {
+
+				if (menu_bar_temp_visible)
+					HideTemporaryMenuBar ();
+				else
+					ShowTemporaryMenuBar ();
+
+				e.RetVal = true;
+				return;
+			}
 
 			// Give the Canvas (and by extension the tools)
 			// first shot at handling the event if
@@ -325,7 +434,7 @@ namespace Pinta
 
 		private void CreateMainMenu (WindowShell shell)
 		{
-			var main_menu = window_shell.CreateMainMenu ("main_menu");
+			main_menu = window_shell.CreateMainMenu ("main_menu");
 
 			main_menu.Append (new Gtk.Action ("file", Catalog.GetString ("_File")).CreateMenuItem ());
 			main_menu.Append (new Gtk.Action ("edit", Catalog.GetString ("_Edit")).CreateMenuItem ());
@@ -343,7 +452,7 @@ namespace Pinta
 			window_menu.Submenu = new Menu ();
 			main_menu.Append (window_menu);
 
-			Gtk.Action pads = new Gtk.Action ("pads", Mono.Unix.Catalog.GetString ("Tool Windows"), null, null);
+			Gtk.Action pads = new Gtk.Action ("pads", Mono.Unix.Catalog.GetString ("Tool _Windows"), null, null);
 			view_menu.Submenu = new Menu ();
 			show_pad = (Menu)((Menu)(view_menu.Submenu)).AppendItem (pads.CreateSubMenuItem ()).Submenu;
 
@@ -374,6 +483,23 @@ namespace Pinta
 			}
 
 			PintaCore.Chrome.InitializeMainMenu (main_menu);
+			
+			PintaCore.Actions.View.MenuBar.Toggled += HandleMenuBarToggled;
+			
+			foreach (Widget child in main_menu.Children) {
+
+				MenuItem item = child as MenuItem;
+
+				if (item == null)
+					continue;
+
+				Menu submenu = item.Submenu as Menu;
+
+				if (submenu == null)
+					continue;
+
+				submenu.Deactivated += HandleMenuDeactivated;
+			}
 		}
 
 		private void CreateMainToolBar (WindowShell shell)
@@ -451,7 +577,7 @@ namespace Pinta
 			layers_pad.Initialize (dock, show_pad);
 
 			// Open Images pad
-			var open_images_pad = new OpenImagesPad ();
+			open_images_pad = new OpenImagesPad ();
 			open_images_pad.Initialize (dock, show_pad);
 
 			// History pad
@@ -488,6 +614,7 @@ namespace Pinta
 		private void LoadUserSettings ()
 		{
 			PintaCore.Actions.View.Rulers.Active = PintaCore.Settings.GetSetting ("ruler-shown", false);
+            PintaCore.Actions.View.MenuBar.Active = PintaCore.Settings.GetSetting ("menubar-shown", true);
             PintaCore.Actions.View.ToolBar.Active = PintaCore.Settings.GetSetting ("toolbar-shown", true);
             PintaCore.Actions.View.ImageTabs.Active = PintaCore.Settings.GetSetting ("image-tabs-shown", true);
             PintaCore.Actions.View.PixelGrid.Active = PintaCore.Settings.GetSetting ("pixel-grid-shown", false);
@@ -530,6 +657,7 @@ namespace Pinta
 			PintaCore.Settings.PutSetting ("window-maximized", (window_shell.GdkWindow.State & Gdk.WindowState.Maximized) != 0);
             PintaCore.Settings.PutSetting ("ruler-shown", PintaCore.Actions.View.Rulers.Active);
             PintaCore.Settings.PutSetting ("image-tabs-shown", PintaCore.Actions.View.ImageTabs.Active);
+            PintaCore.Settings.PutSetting ("menubar-shown", PintaCore.Actions.View.MenuBar.Active);
             PintaCore.Settings.PutSetting ("toolbar-shown", PintaCore.Actions.View.ToolBar.Active);
 			PintaCore.Settings.PutSetting ("pixel-grid-shown", PintaCore.Actions.View.PixelGrid.Active);
 			PintaCore.Settings.PutSetting (LastDialogDirSettingKey, PintaCore.System.LastDialogDirectory);
@@ -604,41 +732,40 @@ namespace Pinta
 		{
 			PintaCore.Workspace.ActiveWorkspace.ZoomToRectangle (PintaCore.Workspace.ActiveDocument.Selection.SelectionPath.GetBounds ().ToCairoRectangle ());
 		}
-		
-		private void ZoomToWindow_Activated (object sender, EventArgs e)
+
+		private void ZoomToWindow_Activated(object sender, EventArgs e)
 		{
-			// The image is small enough to fit in the window
-			if (PintaCore.Workspace.ImageFitsInWindow)
-			{
-				PintaCore.Actions.View.ActualSize.Activate ();
+			var workspace = PintaCore.Workspace;
+			var canvasWindow = workspace.ActiveWorkspace.Canvas.Parent;
+
+			if (workspace.ImageFitsInWindow) {
+				PintaCore.Actions.View.ActualSize.Activate();
+				return;
 			}
-			else
-			{
-				int image_x = PintaCore.Workspace.ImageSize.Width;
-				int image_y = PintaCore.Workspace.ImageSize.Height;
 
-                var canvas_window = PintaCore.Workspace.ActiveWorkspace.Canvas.Parent;
+			int imageWidth = workspace.ImageSize.Width;
+			int imageHeight = workspace.ImageSize.Height;
 
-                var window_x = canvas_window.Allocation.Width;
-                var window_y = canvas_window.Allocation.Height;
+			double windowWidth = canvasWindow.Allocation.Width;
+			double windowHeight = canvasWindow.Allocation.Height;
 
-				double ratio;
+			// Compute scale to fit width or height
+			double ratio = Math.Min(windowWidth / imageWidth, windowHeight / imageHeight);
 
-				// The image is more constrained by width than height
-				if ((double)image_x / (double)window_x >= (double)image_y / (double)window_y)
-				{
-					ratio = (double)(window_x - 20) / (double)image_x;
-				}
-				else
-				{
-					ratio = (double)(window_y - 20) / (double)image_y;					
-				}
+			workspace.Scale = ratio;
 
-				PintaCore.Workspace.Scale = ratio;
-				PintaCore.Actions.View.SuspendZoomUpdate ();
-				(PintaCore.Actions.View.ZoomComboBox.ComboBox as ComboBoxEntry).Entry.Text = ViewActions.ToPercent (PintaCore.Workspace.Scale);
-				PintaCore.Actions.View.ResumeZoomUpdate ();
-			}
+			windowWidth = canvasWindow.Allocation.Width;
+			windowHeight = canvasWindow.Allocation.Height;
+
+			// Recompute scale to fit width or height for better precision
+			ratio = Math.Min(windowWidth / imageWidth, windowHeight / imageHeight);
+
+			workspace.Scale = ratio;
+
+			var comboBoxEntry = PintaCore.Actions.View.ZoomComboBox.ComboBox as ComboBoxEntry;
+			PintaCore.Actions.View.SuspendZoomUpdate();
+			comboBoxEntry.Entry.Text = ViewActions.ToPercent(workspace.Scale);
+			PintaCore.Actions.View.ResumeZoomUpdate();
 
 			PintaCore.Actions.View.ZoomToWindowActivated = true;
 		}
@@ -678,6 +805,42 @@ namespace Pinta
 
             return null;
         }
+        
+        private void HandleMenuBarToggled (object sender, EventArgs e)
+		{
+			if (PintaCore.Actions.View.MenuBar.Active)
+				window_shell.ExpandMenuBar ();
+			else
+				window_shell.CollapseMenuBar ();
+		}
+		
+		private void ShowTemporaryMenuBar ()
+{
+			if (PintaCore.Actions.View.MenuBar.Active)
+				return;
+
+			if (menu_bar_temp_visible)
+				return;
+
+			menu_bar_temp_visible = true;
+
+			window_shell.ExpandMenuBar ();
+		}
+		
+		private void HideTemporaryMenuBar ()
+		{
+			if (!menu_bar_temp_visible)
+				return;
+
+			menu_bar_temp_visible = false;
+
+			window_shell.CollapseMenuBar ();
+		}
+		
+		private void HandleMenuDeactivated (object sender, EventArgs e)
+		{
+			HideTemporaryMenuBar ();
+		}
 		#endregion
 	}
 }

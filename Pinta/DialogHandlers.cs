@@ -146,6 +146,11 @@ namespace Pinta
 			PintaCore.Actions.Layers.RotateZoom.Sensitive = enable;
 		    PintaCore.Actions.Layers.MoveLayerUp.Sensitive = enable;
 		    PintaCore.Actions.Layers.MoveLayerDown.Sensitive = enable;
+            // PintaCore.Actions.Layers.ActivateTopLayer.Sensitive = enable;
+            PintaCore.Actions.Layers.ActivateLayerAbove.Sensitive = enable;
+            PintaCore.Actions.Layers.ActivateLayerBelow.Sensitive = enable;
+            // PintaCore.Actions.Layers.ActivateBottomLayer.Sensitive = enable;
+            PintaCore.Actions.Layers.ToggleLayerVisibility.Sensitive = enable;
 			PintaCore.Actions.Layers.Properties.Sensitive = enable;
 
 			PintaCore.Actions.Adjustments.ToggleActionsSensitive (enable);

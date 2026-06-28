@@ -146,8 +146,11 @@ namespace Pinta.Core
 			toolbar.AppendItem (Image.CropToSelection.CreateToolBarItem ());
 			toolbar.AppendItem (Edit.Deselect.CreateToolBarItem ());
 			View.CreateToolBar (toolbar);
-
-
+            CreateToolBarStatus(toolbar);
+        }
+        
+        private void CreateToolBarStatus (Gtk.Toolbar toolbar)
+        {
 			toolbar.AppendItem (new SeparatorToolItem ());
 			toolbar.AppendItem (new ToolBarImage ("StatusBar.CursorXY.png"));
 
@@ -155,9 +158,59 @@ namespace Pinta.Core
 
 			toolbar.AppendItem (cursor);
 
+            Cairo.Color currentColor = new Cairo.Color(0, 0, 0);
+            Gtk.DrawingArea colorSwatch = new Gtk.DrawingArea();
+            ToolBarLabel hexLabel = new ToolBarLabel ("");
+
 			PintaCore.Chrome.LastCanvasCursorPointChanged += delegate {
-				Gdk.Point pt = PintaCore.Chrome.LastCanvasCursorPoint;
-				cursor.Text = string.Format ("  {0}, {1}", pt.X, pt.Y);
+
+                if (!PintaCore.Workspace.HasOpenDocuments)
+                {
+                    cursor.Text = "  0, 0";
+                    hexLabel.Text = "";
+                    return;
+                }
+
+                Gdk.Point pt = PintaCore.Chrome.LastCanvasCursorPoint;
+                cursor.Text = string.Format ("  {0}, {1}", pt.X, pt.Y);
+
+                var doc = PintaCore.Workspace.ActiveDocument;
+
+                if (!doc.Workspace.PointInCanvas (new Cairo.PointD(pt.X, pt.Y)))
+                {
+                    hexLabel.Text = "";
+                    return;
+                }
+
+                var surface = doc.CurrentUserLayer.Surface;
+
+                if (pt.X < 0 || pt.Y < 0 || pt.X >= surface.Width || pt.Y >= surface.Height)
+                {
+                    hexLabel.Text = "";
+                    return;
+                }
+
+                unsafe {
+                    surface.Flush();
+
+                    byte* dataPtr = (byte*)surface.DataPtr;
+                    int stride = surface.Stride;
+                    byte* pixel = dataPtr + pt.Y * stride + pt.X * 4;
+
+                    byte b = pixel[0];
+                    byte g = pixel[1];
+                    byte r = pixel[2];
+                    byte a = pixel[3];
+
+                    // Update hex text
+                    hexLabel.Text = string.Format("  #{0:X2}{1:X2}{2:X2}({3:X2})", r, g, b, a);
+
+                    // Update swatch color
+                    currentColor = new Cairo.Color(r / 255.0, g / 255.0, b / 255.0);
+
+                    colorSwatch.QueueDraw();
+
+                }
 			};
 
 
@@ -181,7 +234,7 @@ namespace Pinta.Core
 				double maxX = double.MinValue;
 				double maxY = double.MinValue;
 
-				//Calculate the minimum rectangular bounds that surround the current selection.
+				// Calculate the minimum rectangular bounds that surround the current selection.
 				foreach (List<IntPoint> li in PintaCore.Workspace.ActiveDocument.Selection.SelectionPolygons)
 				{
 					foreach (IntPoint ip in li)
@@ -221,8 +274,39 @@ namespace Pinta.Core
 					yDiff = 0d;
 				}
 
-				SelectionSize.Text = string.Format("  {0}, {1}", xDiff, yDiff);
+				SelectionSize.Text = string.Format("  {0}, {1}   ({2}, {3})", xDiff, yDiff, minX, minY);
 			};
+                
+            toolbar.AppendItem(new SeparatorToolItem());
+
+            // Small color preview box
+            colorSwatch.SetSizeRequest(16, 16);
+            Gtk.Alignment align = new Gtk.Alignment(0.5f, 0.5f, 0, 0);
+            align.Add(colorSwatch);
+
+            ToolItem swatchItem = new ToolItem();
+            swatchItem.Add(colorSwatch);
+            swatchItem.Add(align);
+            swatchItem.Expand = false;
+            toolbar.Insert(swatchItem, -1);
+
+            // Hex label
+            toolbar.AppendItem(hexLabel);
+
+            colorSwatch.ExposeEvent += (o, args) =>
+            {
+                using (var g = Gdk.CairoHelper.Create(colorSwatch.GdkWindow))
+                {
+                    g.SetSourceRGB(currentColor.R, currentColor.G, currentColor.B);
+                    g.Rectangle(0, 0, colorSwatch.Allocation.Width, colorSwatch.Allocation.Height);
+                    g.Fill();
+
+                    // Optional border
+                    g.SetSourceRGB(0, 0, 0);
+                    g.Rectangle(0.5, 0.5, colorSwatch.Allocation.Width - 1, colorSwatch.Allocation.Height - 1);
+                    g.Stroke();
+                }
+            };
 		}
 		
 		public void RegisterHandlers ()

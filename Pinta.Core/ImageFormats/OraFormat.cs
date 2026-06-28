@@ -112,6 +112,7 @@ namespace Pinta.Core
 				} catch {
 					MessageDialog md = new MessageDialog (parent, DialogFlags.Modal, MessageType.Error, ButtonsType.Ok, "Could not import layer \"{0}\" from {0}", name, file);
 					md.Title = "Error";
+                    Pinta.Core.Document.MakeDialogNonInteractive(md);
 				
 					md.Run ();
 					md.Destroy ();

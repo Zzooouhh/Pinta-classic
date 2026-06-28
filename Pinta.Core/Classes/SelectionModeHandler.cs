@@ -162,7 +162,26 @@ namespace Pinta.Core
                     doc.Selection.SelectionPolygons = resultingPolygons;
                 }
 
-                doc.Selection.MarkDirty ();
+                doc.Selection.MarkDirty();
+
+				if (doc.Selection.SelectionPolygons.Count > 0)
+				{
+					double minX = double.MaxValue, minY = double.MaxValue;
+					double maxX = double.MinValue, maxY = double.MinValue;
+
+					foreach (var poly in doc.Selection.SelectionPolygons)
+					{
+						foreach (var pt in poly)
+						{
+							minX = Math.Min(minX, pt.X);
+							minY = Math.Min(minY, pt.Y);
+							maxX = Math.Max(maxX, pt.X);
+							maxY = Math.Max(maxY, pt.Y);
+						}
+					}
+
+				}
+
             }
         }
     }

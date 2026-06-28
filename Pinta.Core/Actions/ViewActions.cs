@@ -38,6 +38,7 @@ namespace Pinta.Core
 		public Gtk.Action ZoomToWindow { get; private set; }
 		public Gtk.Action ZoomToSelection { get; private set; }
 		public Gtk.Action ActualSize { get; private set; }
+        public Gtk.ToggleAction MenuBar { get; private set; }
         public Gtk.ToggleAction ToolBar { get; private set; }
         public Gtk.ToggleAction ImageTabs { get; private set; }
         public Gtk.ToggleAction PixelGrid { get; private set; }
@@ -74,19 +75,20 @@ namespace Pinta.Core
 			fact.Add ("Menu.View.ZoomToWindow.png", new Gtk.IconSet (PintaCore.Resources.GetIcon ("Menu.View.ZoomToWindow.png")));
 			fact.AddDefault ();
 			
-			ZoomIn = new Gtk.Action ("ZoomIn", Catalog.GetString ("Zoom In"), null, Stock.ZoomIn);
-			ZoomOut = new Gtk.Action ("ZoomOut", Catalog.GetString ("Zoom Out"), null, Stock.ZoomOut);
-			ZoomToWindow = new Gtk.Action ("ZoomToWindow", Catalog.GetString ("Best Fit"), null, Stock.ZoomFit);
-			ZoomToSelection = new Gtk.Action ("ZoomToSelection", Catalog.GetString ("Zoom to Selection"), null, "Menu.View.ZoomToSelection.png");
-			ActualSize = new Gtk.Action ("ActualSize", Catalog.GetString ("Normal Size"), null, Stock.Zoom100);
-            ToolBar = new Gtk.ToggleAction ("Toolbar", Catalog.GetString ("Toolbar"), null, null);
-            ImageTabs = new Gtk.ToggleAction ("ImageTabs", Catalog.GetString ("Image Tabs"), null, null);
-            PixelGrid = new Gtk.ToggleAction ("PixelGrid", Catalog.GetString ("Pixel Grid"), null, "Menu.View.Grid.png");
-			Rulers = new Gtk.ToggleAction ("Rulers", Catalog.GetString ("Rulers"), null, "Menu.View.Rulers.png");
+			ZoomIn = new Gtk.Action ("ZoomIn", Catalog.GetString ("Zoom _In"), null, Stock.ZoomIn);
+			ZoomOut = new Gtk.Action ("ZoomOut", Catalog.GetString ("Zoom _Out"), null, Stock.ZoomOut);
+			ZoomToWindow = new Gtk.Action ("ZoomToWindow", Catalog.GetString ("_Best Fit"), null, Stock.ZoomFit);
+			ZoomToSelection = new Gtk.Action ("ZoomToSelection", Catalog.GetString ("Zoom to _Selection"), null, "Menu.View.ZoomToSelection.png");
+			ActualSize = new Gtk.Action ("ActualSize", Catalog.GetString ("_Normal Size"), null, Stock.Zoom100);
+            MenuBar = new Gtk.ToggleAction ("Menubar", Catalog.GetString ("_Menubar"), null, null);
+            ToolBar = new Gtk.ToggleAction ("Toolbar", Catalog.GetString ("_Toolbar"), null, null);
+            ImageTabs = new Gtk.ToggleAction ("ImageTabs", Catalog.GetString ("Im_age Tabs"), null, null);
+            PixelGrid = new Gtk.ToggleAction ("PixelGrid", Catalog.GetString ("Pixel _Grid"), null, "Menu.View.Grid.png");
+			Rulers = new Gtk.ToggleAction ("Rulers", Catalog.GetString ("_Rulers"), null, "Menu.View.Rulers.png");
 			Pixels = new Gtk.RadioAction ("Pixels", Catalog.GetString ("Pixels"), null, null, 0);
 			Inches = new Gtk.RadioAction ("Inches", Catalog.GetString ("Inches"), null, null, 1);
 			Centimeters = new Gtk.RadioAction ("Centimeters", Catalog.GetString ("Centimeters"), null, null, 2);
-			Fullscreen = new Gtk.Action ("Fullscreen", Catalog.GetString ("Fullscreen"), null, Stock.Fullscreen);
+			Fullscreen = new Gtk.Action ("Fullscreen", Catalog.GetString ("_Fullscreen"), null, Stock.Fullscreen);
 
 			ZoomCollection = new string[] {
 				ToPercent (36),
@@ -121,6 +123,7 @@ namespace Pinta.Core
 			Centimeters.Group = Pixels.Group;
 
             // The toolbar is shown by default.
+            MenuBar.Active = true;
             ToolBar.Active = true;
             ImageTabs.Active = true;
 		}
@@ -131,6 +134,7 @@ namespace Pinta.Core
 			MenuItem show_pad = (MenuItem)menu.Children[0];
 			menu.Remove (show_pad);
 			
+			menu.Append (MenuBar.CreateAcceleratedMenuItem (Gdk.Key.M, Gdk.ModifierType.ControlMask));
 			menu.Append (ToolBar.CreateMenuItem ());
 			menu.Append (PixelGrid.CreateMenuItem ());
             menu.Append (Rulers.CreateMenuItem ());
@@ -155,12 +159,12 @@ namespace Pinta.Core
 			actualsize.AddAccelerator ("activate", PintaCore.Actions.AccelGroup, new AccelKey (Gdk.Key.A, Gdk.ModifierType.ControlMask | Gdk.ModifierType.ShiftMask, AccelFlags.Visible));
 			menu.Append (actualsize);
 			menu.Append (ZoomToWindow.CreateAcceleratedMenuItem (Gdk.Key.B, Gdk.ModifierType.ControlMask));
-			//menu.Append (ZoomToSelection.CreateAcceleratedMenuItem (Gdk.Key.B, Gdk.ModifierType.ControlMask | Gdk.ModifierType.ShiftMask));
+			menu.Append (ZoomToSelection.CreateAcceleratedMenuItem (Gdk.Key.B, Gdk.ModifierType.ControlMask | Gdk.ModifierType.ShiftMask));
 			menu.Append (Fullscreen.CreateAcceleratedMenuItem (Gdk.Key.F11, Gdk.ModifierType.None));
 
 			menu.AppendSeparator ();
 
-			Gtk.Action unit_action = new Gtk.Action ("RulerUnits", Mono.Unix.Catalog.GetString ("Ruler Units"), null, null);
+			Gtk.Action unit_action = new Gtk.Action ("RulerUnits", Mono.Unix.Catalog.GetString ("Ruler _Units"), null, null);
 			Menu unit_menu = (Menu)menu.AppendItem (unit_action.CreateSubMenuItem ()).Submenu;
 			unit_menu.Append (Pixels.CreateMenuItem ());
 			unit_menu.Append (Inches.CreateMenuItem ());

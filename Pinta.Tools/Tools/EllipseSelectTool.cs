@@ -50,8 +50,8 @@ namespace Pinta.Tools
 			Document doc = PintaCore.Workspace.ActiveDocument;
 
 			doc.Selection.CreateEllipseSelection(r);
-			
-			return r;
+
+			return new Rectangle (r.X, r.Y, r.Width, r.Height);
 		}
 	}
 }

@@ -174,6 +174,7 @@ namespace Pinta.Core
 			BaseTool t = FindTool (tool);
 			
 			if (t != null) {
+                PressedShortcutCounter = 0;
 				SetCurrentTool(t);
 				return true;
 			}

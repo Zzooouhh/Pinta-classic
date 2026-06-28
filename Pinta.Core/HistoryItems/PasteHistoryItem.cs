@@ -35,16 +35,18 @@ namespace Pinta.Core
 	{
 		private Gdk.Pixbuf paste_image;
 		private DocumentSelection old_selection;
+		private PointD paste_position;
 
 		public override bool CausesDirty { get { return true; } }
 
-		public PasteHistoryItem (Gdk.Pixbuf pasteImage, DocumentSelection oldSelection)
+		public PasteHistoryItem (Gdk.Pixbuf pasteImage, DocumentSelection oldSelection, PointD pastePosition)
 		{
 			Text = Catalog.GetString ("Paste");
 			Icon = Stock.Paste;
 
 			paste_image = pasteImage;
 			old_selection = oldSelection;
+			paste_position = pastePosition;
 		}
 
 		public override void Redo ()
@@ -59,8 +61,9 @@ namespace Pinta.Core
 				g.DrawPixbuf (paste_image, new Cairo.Point (0, 0));
 			}
 
-			Swap ();
+			doc.SelectionLayer.Transform.Translate(paste_position.X, paste_position.Y);
 
+			Swap ();
 			PintaCore.Workspace.Invalidate ();
 			PintaCore.Tools.SetCurrentTool (Catalog.GetString ("Move Selected Pixels"));
 		}
@@ -68,7 +71,6 @@ namespace Pinta.Core
 		public override void Undo ()
 		{
 			Swap ();
-
 			PintaCore.Layers.DestroySelectionLayer ();
 			PintaCore.Workspace.Invalidate ();
 		}

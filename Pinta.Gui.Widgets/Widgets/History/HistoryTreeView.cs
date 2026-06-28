@@ -92,12 +92,16 @@ namespace Pinta.Gui.Widgets
 		public bool HistoryItemSelected (TreeSelection selection, TreeModel model, TreePath path, bool path_currently_selected)
 		{
 			int current = path.Indices[0];
+			var tool = PintaCore.Tools.CurrentTool;
+			
 			if (!path_currently_selected) {
 				while (PintaCore.History.Pointer < current) {
 					PintaCore.History.Redo ();
+					tool?.AfterRedo();
 				}
 				while (PintaCore.History.Pointer > current) {
 					PintaCore.History.Undo ();
+					tool?.AfterUndo();
 				}
 			}
 			return true;

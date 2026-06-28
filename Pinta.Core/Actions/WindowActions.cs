@@ -42,8 +42,8 @@ namespace Pinta.Core
 
 		public WindowActions ()
 		{
-			SaveAll = new Gtk.Action ("SaveAll", Catalog.GetString ("Save All"), null, Stock.Save);
-			CloseAll = new Gtk.Action ("CloseAll", Catalog.GetString ("Close All"), null, Stock.Close);
+			SaveAll = new Gtk.Action ("SaveAll", Catalog.GetString ("_Save All"), null, Stock.Save);
+			CloseAll = new Gtk.Action ("CloseAll", Catalog.GetString ("_Close All"), null, Stock.Close);
 
 			OpenWindows = new List<RadioAction> ();
 			action_menu_items = new Dictionary<RadioAction,CheckMenuItem> ();
@@ -99,6 +99,11 @@ namespace Pinta.Core
 			OpenWindows.Remove (act);
             		act.Dispose ();
 
+			RefreshWindowMenu ();
+		}
+
+		public void RefreshWindowMenu ()
+		{
 			window_menu.HideAll ();
 
 			// Remove all the menu items from the menu
@@ -115,7 +120,8 @@ namespace Pinta.Core
 			CheckMenuItem menuitem;
 
 			for (int i = 0; i < OpenWindows.Count; i++) {
-				RadioAction action = OpenWindows[i];
+				Document doc = PintaCore.Workspace.OpenDocuments[i];
+				RadioAction action = OpenWindows.First(a => a.Name == doc.Guid.ToString());
 
 				if (i < 9)
 					menuitem = action.CreateAcceleratedMenuItem (IntegerToNumKey (i + 1), Gdk.ModifierType.Mod1Mask);
@@ -128,6 +134,7 @@ namespace Pinta.Core
 
 			window_menu.ShowAll ();
 		}
+
 		#endregion
 
 		#region Private Methods

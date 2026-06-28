@@ -239,9 +239,31 @@ namespace Pinta.Core
 			if (LayerPropertyChanged != null)
 				LayerPropertyChanged (sender, e);
 			
-			//TODO Get the workspace to subscribe to this event, and invalidate itself.
+			// TODO Get the workspace to subscribe to this event, and invalidate itself.
 			PintaCore.Workspace.Invalidate ();
 		}
+        
+        public void ActivateLayerAbove ()
+        {
+            if (PintaCore.Layers.CurrentLayerIndex < PintaCore.Layers.Count - 1)
+                PintaCore.Layers.SetCurrentLayer (PintaCore.Layers.CurrentLayerIndex + 1);
+        }
+
+        public void ActivateLayerBelow ()
+        {
+            if (PintaCore.Layers.CurrentLayerIndex > 0)
+                PintaCore.Layers.SetCurrentLayer (PintaCore.Layers.CurrentLayerIndex - 1);
+        }
+
+        // public void ActivateTopLayer ()
+        // {
+            // PintaCore.Layers.SetCurrentLayer (PintaCore.Layers.Count - 1);
+        // }
+
+        // public void ActivateBottomLayer ()
+        // {
+            // PintaCore.Layers.SetCurrentLayer (0);
+        // }
 		#endregion
 
 		#region Events

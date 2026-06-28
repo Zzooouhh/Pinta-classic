@@ -47,6 +47,7 @@ namespace Pinta.Core
 		public static EffectsManager Effects { get; private set; }
 
         public const string ApplicationVersion = "1.7.1";
+        public static Gdk.Rectangle ClipboardOrigin = Gdk.Rectangle.Zero;
 
 		static PintaCore ()
 		{

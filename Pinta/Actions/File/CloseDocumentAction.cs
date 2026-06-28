@@ -80,6 +80,7 @@ namespace Pinta.Actions
 
 			// so that user won't accidentally overwrite
 			md.DefaultResponse = ResponseType.Cancel;
+            Pinta.Core.Document.MakeDialogNonInteractive(md);
 
 			ResponseType response = (ResponseType)md.Run ();
 			md.Destroy ();

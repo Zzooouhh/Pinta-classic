@@ -168,6 +168,8 @@ namespace Pinta.Tools
 			shape_origin = point;
 			current_point = point;
 			
+            canvas.GrabFocus ();
+            mouse_button = args.Event.Button;
 			is_drawing = true;
 			
 			if (args.Event.Button == 1) {
@@ -199,6 +201,7 @@ namespace Pinta.Tools
 			
 			doc.Workspace.Invalidate (last_dirty.ToGdkRectangle ());
 			
+            mouse_button = 0;
 			is_drawing = false;
 
 			if (surface_modified)

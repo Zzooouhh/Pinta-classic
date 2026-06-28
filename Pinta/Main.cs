@@ -33,34 +33,46 @@ using Mono.Unix;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Net;
+using System.Net.Sockets;
+using System.Threading;
 
 namespace Pinta
 {
 	class MainClass
 	{
+        private static TcpListener singleInstanceListener;
+        private static int singleInstancePort = -1;
+        private static bool no_document = false;
+        private static int default_width = 800;
+        private static int default_height = 600;
+        
 		[STAThread]
 		public static void Main (string[] args)
 		{
-			string locale_dir = Path.Combine (SystemManager.GetDataRootDirectory (), "locale");
+			string locale_dir = null;
+			string force_lang = null;
 
-			try {
-				Catalog.Init ("pinta", locale_dir);
-			} catch (Exception ex) {
-				Console.WriteLine (ex);
-			}
-
+			bool show_help = false;			
+			bool show_version = false;
 			int threads = -1;
-                        bool show_help = false;
-                        bool show_version = false;
 			
 			var p = new OptionSet () {
                                 { "h|help", Catalog.GetString("Show this message and exit."), v => show_help = v != null },
-                                { "v|version", Catalog.GetString("Display the application version."), v => show_version = v != null },
-				{ "rt|render-threads=", Catalog.GetString ("number of threads to use for rendering"), (int v) => threads = v }
+                                { "default-width=", Catalog.GetString("New Pinta document will have default width equal to specified value."), (int v) => default_width = v },
+                                { "default-height=", Catalog.GetString("New Pinta document will have default height equal to specified value."), (int v) => default_height = v },
+                                { "locale-dir=", Catalog.GetString("Force Pinta to use the specified locale directory (provide full path to directory)."), (string v) => locale_dir = v},
+                                { "l|language=", Catalog.GetString("Force Pinta to use the specified LANGUAGE env variable (use format like \"de\")."), (string v) => force_lang = v},
+                                { "n|no-document", Catalog.GetString("Launch Pinta without a new document open (ignored if a target was specified)."), v => no_document = v != null },
+                                { "p|port=", Catalog.GetString("Launch Pinta as a single instance TCP server with the specified port number (or use an existing Pinta instance with the corresponding port number)."), (int v) => singleInstancePort = v },
+								{ "r|render-threads=", Catalog.GetString ("Specify number of threads to use for rendering"), (int v) => threads = v },
+                                { "v|version", Catalog.GetString("Display the application version."), v => show_version = v != null }
 			};
 
-			List<string> extra;
+			if (string.IsNullOrEmpty(locale_dir))
+				locale_dir = Path.Combine (SystemManager.GetDataRootDirectory (), "locale");
 			
+			List<string> extra;
 			try {
 				extra = p.Parse (args);
 			} catch (OptionException e) {
@@ -69,18 +81,64 @@ namespace Pinta
 				return;
 			}
 
-                        if (show_version)
-                        {
-                            Console.WriteLine (PintaCore.ApplicationVersion);
-                            return;
-                        }
+			if (!string.IsNullOrEmpty(force_lang)) {
 
-                        if (show_help)
-                        {
-                            ShowHelp (p);
-                            return;
-                        }
+				Environment.SetEnvironmentVariable("LANGUAGE", force_lang);
 
+				string mo = Path.Combine(
+					locale_dir,
+					force_lang,
+					"LC_MESSAGES",
+					"pinta.mo"
+				);
+
+				if (File.Exists(mo))
+					Console.WriteLine ($"Using language override: {force_lang}");
+				else
+					Console.WriteLine ($"Language file not found! ({force_lang})");
+			}
+
+			try {
+				Catalog.Init ("pinta", locale_dir);
+			} catch (Exception ex) {
+				Console.WriteLine (ex);
+			}
+			
+            if (show_version)
+            {
+                Console.WriteLine (PintaCore.ApplicationVersion);
+                return;
+            }
+
+            if (show_help)
+            {
+                ShowHelp (p);
+                return;
+            }
+
+            if (singleInstancePort != -1) {
+
+                try
+                {
+                    singleInstanceListener = new TcpListener(IPAddress.Loopback, singleInstancePort);
+                    singleInstanceListener.Start();
+                    singleInstancePort = -1;
+                }
+                catch (SocketException)
+                {
+                    SendToExistingInstance(args);
+                    return;
+                }
+
+                if (singleInstancePort != -1) {
+                }
+                StartTcpServerLoop();
+            } else {
+                Console.Error.WriteLine(
+                    $"Pinta running in new-instance mode."
+                );
+            }
+            
 			GLib.ExceptionManager.UnhandledException += new GLib.UnhandledExceptionHandler (ExceptionManager_UnhandledException);
 
 			if (SystemManager.GetOperatingSystem () == OS.Windows) {
@@ -97,18 +155,18 @@ namespace Pinta
 				RegisterForAppleEvents ();
 			}
 
-			OpenFilesFromCommandLine (extra);
+            OpenFilesFromCommandLine(extra);
 			
 			Application.Run ();
 		}
 
-                private static void ShowHelp (OptionSet p)
-                {
-                    Console.WriteLine (Catalog.GetString ("Usage: pinta [files]"));
-                    Console.WriteLine ();
-                    Console.WriteLine (Catalog.GetString ("Options: "));
-                    p.WriteOptionDescriptions (Console.Out);
-                }
+        private static void ShowHelp (OptionSet p)
+        {
+            Console.WriteLine (Catalog.GetString ("Usage: pinta [files]"));
+            Console.WriteLine ();
+            Console.WriteLine (Catalog.GetString ("Options: "));
+            p.WriteOptionDescriptions (Console.Out);
+        }
 
 		private static void OpenFilesFromCommandLine (List<string> extra)
 		{
@@ -121,17 +179,140 @@ namespace Pinta
 				}
 			}
 
-			if (extra.Count > 0)
-			{
-				foreach (var file in extra)
-					PintaCore.Workspace.OpenFile (file);
-			}
+            if (extra.Count > 0)
+            {
+                foreach (var file in extra)
+                {
+                    PintaCore.Workspace.OpenFile (file);
+                    
+                    string fullPath = System.IO.Path.GetFullPath (file);
+                    
+                    string folder = System.IO.Path.GetDirectoryName (fullPath);
+
+                    // This makes GetDialogDirectory() return this folder instead of Pictures
+                    if (System.IO.Directory.Exists (folder)) {
+                        PintaCore.System.LastDialogDirectory = folder;
+                        
+                        // Optional: Try to update Settings too if you can access the key string.
+                        // If LastDialogDirSettingKey is public, you can do:
+                        // PintaCore.Settings.PutSetting (LastDialogDirSettingKey, folder);
+                    }
+                }
+            }
 			else
 			{
 				// Create a blank document
-				PintaCore.Workspace.NewDocument (new Gdk.Size (800, 600), new Cairo.Color (1, 1, 1));
+				if (!no_document) {
+					// PintaCore.System.LastDialogDirectory = PintaCore.System.DefaultDialogDirectory; // uncomment to make new documents use default directory at first
+					PintaCore.Workspace.NewDocument (new Gdk.Size (default_width, default_height), new Cairo.Color (1, 1, 1));
+				}
 			}
 		}
+
+        private static void StartTcpServerLoop()
+        {
+            Thread thread = new Thread(() =>
+            {
+                while (true)
+                {
+                    try
+                    {
+                        var client = singleInstanceListener.AcceptTcpClient();
+
+                        List<string> filesToOpen = new List<string>();
+                        using (var stream = client.GetStream())
+                        using (var reader = new StreamReader(stream))
+                        {
+                            string file;
+                            while ((file = reader.ReadLine()) != null)
+                            {
+                                if (!string.IsNullOrWhiteSpace(file))
+                                    filesToOpen.Add(file);
+                            }
+                        }
+
+                        client.Close();
+
+                        if (filesToOpen.Count > 0)
+                        {
+                            // Queue the whole batch at once
+                            Application.Invoke(delegate
+                            {
+                                OpenFilesInWorkspace(filesToOpen);
+                            });
+                        } else {
+                            Console.Error.WriteLine(
+                                $"Error: no file found to open"
+                            );
+                        }
+                    }
+                    catch
+                    {
+                        break;
+                    }
+                }
+            });
+
+            thread.IsBackground = true;
+            thread.Start();
+        }
+
+        // Open a batch of files safely
+        private static void OpenFilesInWorkspace(List<string> files)
+        {
+            foreach (var file in files)
+            {
+                if (File.Exists(file))
+                {
+                    PintaCore.Chrome.MainWindow.Present();
+                    try
+                    {
+                        PintaCore.Workspace.OpenFile (file);
+                    }
+                    catch (FormatException)
+                    {
+                        // Only triggered for truly unsupported files
+                        Console.Error.WriteLine(
+                            $"Error: could not open file {file}: unsupported format"
+                        );
+                    }
+                } else {
+                    Console.Error.WriteLine(
+                        $"Error: could not open file {file}: not found"
+                    );
+                }
+            }
+        }
+
+        private static bool SendToExistingInstance(string[] args)
+        {
+            try
+            {
+                var client = new TcpClient();
+                client.Connect(IPAddress.Loopback, singleInstancePort);
+
+                using (var stream = client.GetStream())
+                using (var writer = new StreamWriter(stream))
+                {
+                    foreach (var arg in args)
+                    {
+                        if (!arg.StartsWith("-"))
+                            writer.WriteLine(Path.GetFullPath(arg));
+                    }
+                }
+
+                client.Close();
+                return true;
+            }
+            catch
+            {        
+                Console.Error.WriteLine(
+                    $"Warning: Could not bind to TCP port {singleInstancePort}. " +
+                    "Single-instance file forwarding may not work."
+                );
+                return false;
+            }
+        }
 
 		private static void ExceptionManager_UnhandledException (GLib.UnhandledExceptionArgs args)
 		{

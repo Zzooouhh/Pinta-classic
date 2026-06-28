@@ -63,6 +63,50 @@ namespace Pinta.Tools
 			PintaCore.Workspace.SelectionHandler.BuildToolbar (tb);
 		}
 
+        protected override void OnKeyDown (Gtk.DrawingArea canvas, Gtk.KeyPressEventArgs args)
+        {
+            if (mouse_button != 1 && mouse_button != 3) {
+                base.OnKeyDown (canvas, args);
+                return;
+            }
+            if (lasso_polygon != null && lasso_polygon.Count > 0) {
+                bool ctrl = (args.Event.State & Gdk.ModifierType.ControlMask) != 0;
+                int delta = ctrl ? 10 : 1;
+
+                int lastIndex = lasso_polygon.Count - 1;
+                IntPoint p = lasso_polygon[lastIndex];
+
+                switch (args.Event.Key) {
+                    case Gdk.Key.Left:
+                        p.X -= delta;
+                        break;
+                    case Gdk.Key.Right:
+                        p.X += delta;
+                        break;
+                    case Gdk.Key.Up:
+                        p.Y -= delta;
+                        break;
+                    case Gdk.Key.Down:
+                        p.Y += delta;
+                        break;
+                    default:
+                        base.OnKeyDown (canvas, args);
+                        return;
+                }
+
+                var doc = PintaCore.Workspace.ActiveDocument;
+                lasso_polygon[lastIndex] = p;
+
+                if (doc.Selection != null) {
+                    doc.Selection.SelectionPolygons.Clear();
+                    doc.Selection.SelectionPolygons.Add (lasso_polygon.ToList ());
+                    SelectionModeHandler.PerformSelectionMode (combine_mode, doc.Selection.SelectionPolygons);
+                    doc.Workspace.Invalidate();
+                }
+                return; // Don't pass to base
+            }
+        }
+
 		#region Mouse Handlers
 		protected override void OnMouseDown (Gtk.DrawingArea canvas, Gtk.ButtonPressEventArgs args, Cairo.PointD point)
 		{
@@ -74,6 +118,7 @@ namespace Pinta.Tools
 
 			combine_mode = PintaCore.Workspace.SelectionHandler.DetermineCombineMode (args);			
 			path = null;
+            mouse_button = args.Event.Button;
 			is_drawing = true;
 
 			var doc = PintaCore.Workspace.ActiveDocument;
@@ -149,6 +194,7 @@ namespace Pinta.Tools
 			}
 
 			lasso_polygon.Clear();
+            mouse_button = 0;
 			is_drawing = false;
 		}
 		#endregion

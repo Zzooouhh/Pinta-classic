@@ -58,6 +58,17 @@ namespace Pinta.Gui.Widgets
             Horizontal,
             Vertical
         }
+        
+        private string GetPrimaryHex()
+{
+            var c = PintaCore.Palette.PrimaryColor;
+
+            byte r = (byte)(c.R * 255);
+            byte g = (byte)(c.G * 255);
+            byte b = (byte)(c.B * 255);
+
+            return string.Format("#{0:X2}{1:X2}{2:X2}", r, g, b);
+        }
 
 		public ColorPaletteWidget ()
 		{
@@ -206,6 +217,41 @@ namespace Pinta.Gui.Widgets
                         paletteIndex++;
                     }
                 }
+
+                // Draw hex color code
+                string hex = GetPrimaryHex();
+
+                g.Save();
+
+                g.SelectFontFace("Monospace",
+                    Cairo.FontSlant.Normal,
+                    Cairo.FontWeight.Normal);
+
+                g.SetFontSize(10);
+
+                Cairo.TextExtents te = g.TextExtents(hex);
+
+                double padding = 4;
+
+                if (orientation == OrientationEnum.Vertical)
+                {
+                    // Draw above primary color box
+                    g.MoveTo(
+                        (Allocation.Width - te.Width) / 2,
+                        padding + te.Height + startI + iRows * swatchSize);
+                }
+                else
+                {
+                    // Horizontal orientation → draw at far right
+                    g.MoveTo(
+                        Allocation.Width - te.Width - padding,
+                        Allocation.Height - padding);
+                }
+
+				g.SetSourceRGB(0.5, 0.5, 0.5);
+                g.ShowText(hex);
+
+                g.Restore();
 			}
 			
 			return true;

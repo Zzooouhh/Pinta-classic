@@ -59,7 +59,7 @@ namespace Pinta.Core
 
 			recent_data = new RecentData ();
 			recent_data.AppName = "Pinta";
-			recent_data.AppExec = GetExecutablePathName ();
+			recent_data.AppExec = "pinta %u";
 			recent_data.MimeType = "image/*";
 		}
 

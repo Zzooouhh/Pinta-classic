@@ -51,8 +51,10 @@ namespace Pinta.Tools.Brushes
 				g.Fill ();
 			}
             else {
-				g.MoveTo (lastX + 0.5, lastY + 0.5);
-				g.LineTo (x + 0.5, y + 0.5);
+                double offset = (g.LineWidth % 2 != 0 || g.Antialias != Antialias.None) ? 0.5 : 0.0;
+
+                g.MoveTo (lastX + offset, lastY + offset);
+                g.LineTo (x + offset, y + offset);
 				g.StrokePreserve ();
 			}
 

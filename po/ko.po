@@ -52,73 +52,73 @@ msgid "Add-in Manager"
 msgstr "추가 기능 관리자"
 
 #: ../Pinta.Core/Actions/EditActions.cs:69
-msgid "Undo"
+msgid "_Undo"
 msgstr "실행취소"
 
 #: ../Pinta.Core/Actions/EditActions.cs:70
-msgid "Redo"
+msgid "_Redo"
 msgstr "재실행"
 
 #: ../Pinta.Core/Actions/EditActions.cs:71
 #: ../Pinta.Core/Actions/EditActions.cs:229
-msgid "Cut"
+msgid "Cu_t"
 msgstr "오려두기"
 
 #: ../Pinta.Core/Actions/EditActions.cs:72
-msgid "Copy"
+msgid "_Copy"
 msgstr "복사"
 
 #: ../Pinta.Core/Actions/EditActions.cs:73
-msgid "Copy Merged"
+msgid "Copy _Merged"
 msgstr ""
 
 #: ../Pinta.Core/Actions/EditActions.cs:74
 #: ../Pinta.Core/Classes/Document.cs:787
 #: ../Pinta.Core/HistoryItems/PasteHistoryItem.cs:43
-msgid "Paste"
+msgid "_Paste"
 msgstr "붙여넣기"
 
 #: ../Pinta.Core/Actions/EditActions.cs:75
 #: ../Pinta.Core/Classes/Document.cs:783
-msgid "Paste Into New Layer"
+msgid "Paste Into New _Layer"
 msgstr "새 레이어로 붙여넣기"
 
 #: ../Pinta.Core/Actions/EditActions.cs:76
-msgid "Paste Into New Image"
+msgid "Paste Into New I_mage"
 msgstr "새 이미지로 붙여넣기"
 
 #: ../Pinta.Core/Actions/EditActions.cs:77
 #: ../Pinta.Core/Actions/EditActions.cs:231
-msgid "Erase Selection"
+msgid "_Erase Selection"
 msgstr "선택 영역 지우기"
 
 #: ../Pinta.Core/Actions/EditActions.cs:78
 #: ../Pinta.Core/Actions/EditActions.cs:191
-msgid "Fill Selection"
+msgid "_Fill Selection"
 msgstr "선택 영역 채우기"
 
 #: ../Pinta.Core/Actions/EditActions.cs:79
 #: ../Pinta.Core/Actions/EditActions.cs:422
-msgid "Invert Selection"
+msgid "_Invert Selection"
 msgstr "선택 영역 반전"
 
 #: ../Pinta.Core/Actions/EditActions.cs:80
 #: ../Pinta.Core/Actions/EditActions.cs:200
-msgid "Select All"
+msgid "_Select All"
 msgstr "전체 선택"
 
 #: ../Pinta.Core/Actions/EditActions.cs:81
-msgid "Deselect All"
+msgid "_Deselect All"
 msgstr "전체 선택해제"
 
 #: ../Pinta.Core/Actions/EditActions.cs:83
 #: ../Pinta.Core/Actions/FileActions.cs:56
-msgid "Open..."
+msgid "_Open..."
 msgstr "열기"
 
 #: ../Pinta.Core/Actions/EditActions.cs:84
 #: ../Pinta.Core/Actions/FileActions.cs:68
-msgid "Save As..."
+msgid "Save _As..."
 msgstr "다른 이름으로 저장..."
 
 #: ../Pinta.Core/Actions/EditActions.cs:85
@@ -131,7 +131,7 @@ msgstr "색상 수 설정"
 
 #: ../Pinta.Core/Actions/EditActions.cs:127 ../Pinta/Pads/ColorPalettePad.cs:42
 #: ../Pinta/Pads/ColorPalettePad.cs:49
-msgid "Palette"
+msgid "P_alette"
 msgstr "팔렛트"
 
 #: ../Pinta.Core/Actions/EditActions.cs:240
@@ -156,32 +156,32 @@ msgid "Save Palette File"
 msgstr "팔렛트 파일 저장"
 
 #: ../Pinta.Core/Actions/FileActions.cs:54
-msgid "New..."
+msgid "_New..."
 msgstr "새로 만듦..."
 
 #: ../Pinta.Core/Actions/FileActions.cs:55
-msgid "New Screenshot..."
+msgid "New Screensho_t..."
 msgstr "새로운 스크린샷..."
 
 #: ../Pinta.Core/Actions/FileActions.cs:57
-msgid "Open Recent"
+msgid "Open _Recent"
 msgstr ""
 
 #: ../Pinta.Core/Actions/FileActions.cs:66
 #: ../Pinta.Docking/DockLibrary/DockItemTitleTab.cs:175
-msgid "Close"
+msgid "_Close"
 msgstr "닫기"
 
 #: ../Pinta.Core/Actions/FileActions.cs:67
-msgid "Save"
+msgid "_Save"
 msgstr "저장"
 
 #: ../Pinta.Core/Actions/FileActions.cs:69
-msgid "Print"
+msgid "_Print"
 msgstr "출력"
 
 #: ../Pinta.Core/Actions/FileActions.cs:70
-msgid "Quit"
+msgid "_Quit"
 msgstr "종료"
 
 #: ../Pinta.Core/Actions/FileActions.cs:72
@@ -193,113 +193,113 @@ msgid "Open"
 msgstr "열기"
 
 #: ../Pinta.Core/Actions/HelpActions.cs:52
-msgid "Contents"
+msgid "_Contents"
 msgstr "내용"
 
 #: ../Pinta.Core/Actions/HelpActions.cs:53
-msgid "Pinta Website"
+msgid "Pinta _Website"
 msgstr "Pinta 웹사이트"
 
 #: ../Pinta.Core/Actions/HelpActions.cs:54
-msgid "File a Bug"
+msgid "File a _Bug"
 msgstr "버그 정보 파일"
 
 #: ../Pinta.Core/Actions/HelpActions.cs:55
-msgid "Translate This Application"
+msgid "_Translate This Application"
 msgstr "현재 어플리케이션 번역하기"
 
 #: ../Pinta.Core/Actions/HelpActions.cs:56 ../Pinta/MainWindow.cs:368
-msgid "About"
+msgid "_About"
 msgstr "소개"
 
 #: ../Pinta.Core/Actions/ImageActions.cs:60
 #: ../Pinta.Core/Actions/ImageActions.cs:284
-msgid "Crop to Selection"
+msgid "Cro_p to Selection"
 msgstr "선택영역 잘라내기"
 
 #: ../Pinta.Core/Actions/ImageActions.cs:61
-msgid "Auto Crop"
+msgid "_Auto Crop"
 msgstr "자동으로 잘라내기"
 
 #: ../Pinta.Core/Actions/ImageActions.cs:62
-msgid "Resize Image..."
+msgid "_Resize Image..."
 msgstr "이미지 크기조정..."
 
 #: ../Pinta.Core/Actions/ImageActions.cs:63
-msgid "Resize Canvas..."
+msgid "Canvas _Size..."
 msgstr "캔버스 크기조정..."
 
 #: ../Pinta.Core/Actions/ImageActions.cs:64
 #: ../Pinta.Core/Actions/LayerActions.cs:70
-msgid "Flip Horizontal"
+msgid "Flip _Horizontal"
 msgstr "수평 뒤집기"
 
 #: ../Pinta.Core/Actions/ImageActions.cs:65
 #: ../Pinta.Core/Actions/LayerActions.cs:71
-msgid "Flip Vertical"
+msgid "Flip _Vertical"
 msgstr "수직 뒤집기"
 
 #: ../Pinta.Core/Actions/ImageActions.cs:66
 #: ../Pinta.Core/HistoryItems/InvertHistoryItem.cs:62
-msgid "Rotate 90° Clockwise"
+msgid "Rotate 9_0° Clockwise"
 msgstr "시계방향으로  90° 회전"
 
 #: ../Pinta.Core/Actions/ImageActions.cs:67
 #: ../Pinta.Core/HistoryItems/InvertHistoryItem.cs:66
-msgid "Rotate 90° Counter-Clockwise"
+msgid "Rotate _90° Counter-Clockwise"
 msgstr "반시계 방향으로   90° 회전"
 
 #: ../Pinta.Core/Actions/ImageActions.cs:68
 #: ../Pinta.Core/HistoryItems/InvertHistoryItem.cs:50
-msgid "Rotate 180°"
+msgid "Rotate 1_80°"
 msgstr "180° 회전"
 
 #: ../Pinta.Core/Actions/ImageActions.cs:69
 #: ../Pinta.Core/Actions/ImageActions.cs:146
-msgid "Flatten"
+msgid "_Flatten"
 msgstr "편평하게"
 
 #: ../Pinta.Core/Actions/LayerActions.cs:65
 #: ../Pinta.Core/Actions/LayerActions.cs:292
 #: ../Pinta.Core/Classes/Document.cs:846
-msgid "Add New Layer"
+msgid "_Add New Layer"
 msgstr "신규 레이어 추가"
 
 #: ../Pinta.Core/Actions/LayerActions.cs:66
 #: ../Pinta.Core/Actions/LayerActions.cs:275
-msgid "Delete Layer"
+msgid "De_lete Layer"
 msgstr "레이어 삭제"
 
 #: ../Pinta.Core/Actions/LayerActions.cs:67
 #: ../Pinta.Core/Actions/LayerActions.cs:266
-msgid "Duplicate Layer"
+msgid "_Duplicate Layer"
 msgstr "레이어 복제"
 
 #: ../Pinta.Core/Actions/LayerActions.cs:68
 #: ../Pinta.Core/Actions/LayerActions.cs:244
-msgid "Merge Layer Down"
+msgid "_Merge Layer Down"
 msgstr "레이어 합치기"
 
 #: ../Pinta.Core/Actions/LayerActions.cs:69
-msgid "Import from File..."
+msgid "_Import from File..."
 msgstr "파일에서 가져오기..."
 
 #: ../Pinta.Core/Actions/LayerActions.cs:72
-msgid "Rotate / Zoom Layer..."
+msgid "_Rotate / _Zoom Layer..."
 msgstr "레이어 회전/줌..."
 
 #: ../Pinta.Core/Actions/LayerActions.cs:73
 #: ../Pinta.Core/Actions/LayerActions.cs:219
-msgid "Move Layer Up"
+msgid "Move Layer _Up"
 msgstr "레이어 위로 보내기"
 
 #: ../Pinta.Core/Actions/LayerActions.cs:74
 #: ../Pinta.Core/Actions/LayerActions.cs:230
-msgid "Move Layer Down"
+msgid "Move Layer D_own"
 msgstr "레이어 아래로 보내기"
 
 #: ../Pinta.Core/Actions/LayerActions.cs:75
-msgid "Layer Properties..."
+msgid "Layer _Properties..."
 msgstr "레이어 속성.."
 
 #: ../Pinta.Core/Actions/LayerActions.cs:157
@@ -312,39 +312,39 @@ msgid "Import From File"
 msgstr "파일에서 가져오기"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:77
-msgid "Zoom In"
+msgid "Zoom _In"
 msgstr "확대"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:78
-msgid "Zoom Out"
+msgid "Zoom _Out"
 msgstr "축소"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:79
-msgid "Best Fit"
+msgid "_Best Fit"
 msgstr "최적 맞춤"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:80
-msgid "Zoom to Selection"
+msgid "Zoom to _Selection"
 msgstr "선택영역 확대"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:81
-msgid "Normal Size"
+msgid "_Normal Size"
 msgstr ""
 
 #: ../Pinta.Core/Actions/ViewActions.cs:82
-msgid "Toolbar"
+msgid "_Toolbar"
 msgstr "도구 모음"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:83
-msgid "Image Tabs"
+msgid "Im_age Tabs"
 msgstr "이미지 탭"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:84
-msgid "Pixel Grid"
+msgid "Pixel _Grid"
 msgstr "픽셀 안내선"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:85
-msgid "Rulers"
+msgid "_Rulers"
 msgstr "눈금자"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:86
@@ -360,7 +360,7 @@ msgid "Centimeters"
 msgstr "센티미터"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:89
-msgid "Fullscreen"
+msgid "_Fullscreen"
 msgstr "전체화면"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:115
@@ -371,7 +371,7 @@ msgid "Window"
 msgstr "창"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:163
-msgid "Ruler Units"
+msgid "Ruler _Units"
 msgstr "눈금 단위"
 
 #. Translators: This specifies the format of the zoom percentage choices
@@ -382,11 +382,11 @@ msgid "{0}%"
 msgstr "{0}%"
 
 #: ../Pinta.Core/Actions/WindowActions.cs:45
-msgid "Save All"
+msgid "_Save All"
 msgstr "모두 저장"
 
 #: ../Pinta.Core/Actions/WindowActions.cs:46
-msgid "Close All"
+msgid "_Close All"
 msgstr "모두 닫기"
 
 #: ../Pinta.Core/Classes/BaseTool.cs:262
@@ -2098,7 +2098,7 @@ msgid "_Window"
 msgstr "창(_W)"
 
 #: ../Pinta/MainWindow.cs:346
-msgid "Tool Windows"
+msgid "Tool _Windows"
 msgstr "도구 창"
 
 #: ../Pinta/MainWindow.cs:350
@@ -2129,7 +2129,7 @@ msgid "Canvas"
 msgstr ""
 
 #: ../Pinta/Pads/HistoryPad.cs:43 ../Pinta/Pads/HistoryPad.cs:52
-msgid "History"
+msgid "_History"
 msgstr "작업 기록"
 
 #: ../Pinta/Pads/LayersPad.cs:43 ../Pinta/Pads/LayersPad.cs:56
@@ -2137,11 +2137,11 @@ msgid "Layers"
 msgstr "레이어"
 
 #: ../Pinta/Pads/OpenImagesPad.cs:41 ../Pinta/Pads/OpenImagesPad.cs:48
-msgid "Images"
+msgid "_Images"
 msgstr ""
 
 #: ../Pinta/Pads/ToolBoxPad.cs:42 ../Pinta/Pads/ToolBoxPad.cs:49
-msgid "Tools"
+msgid "_Tools"
 msgstr ""
 
 #: Polar Inversion dialog

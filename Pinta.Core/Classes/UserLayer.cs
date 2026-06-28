@@ -117,17 +117,17 @@ namespace Pinta.Core
 			}
 		}
 
-		public override void Resize(int width, int height)
-		{
-			base.Resize (width, height);
+        public override void Resize(int width, int height, Cairo.Filter filter)
+        {
+            base.Resize (width, height, filter);
 
-			foreach (ReEditableLayer rel in ReEditableLayers)
-			{
-				if (rel.IsLayerSetup)
-				{
-					rel.Layer.Resize(width, height);
-				}
-			}
-		}
+            foreach (ReEditableLayer rel in ReEditableLayers)
+            {
+                if (rel.IsLayerSetup)
+                {
+                    rel.Layer.Resize(width, height, filter);
+                }
+            }
+        }
 	}
 }

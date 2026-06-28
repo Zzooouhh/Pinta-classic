@@ -35,7 +35,7 @@ using Pinta.Docking.Gui;
 
 namespace Pinta.Docking.DockNotebook
 {
-	public delegate void TabsReorderedHandler (Widget widget, int oldPlacement, int newPlacement);
+	public delegate void TabsReorderedHandler (DockNotebookTab tab, int oldPlacement, int newPlacement);
 
 	public class DockNotebook : Gtk.VBox
 	{
@@ -135,6 +135,7 @@ namespace Pinta.Docking.DockNotebook
 
 		Cursor fleurCursor = new Cursor (CursorType.Fleur);
 
+		public event TabsReorderedHandler TabsReordered;
 		public event EventHandler<TabEventArgs> TabActivated;
 
 		public event EventHandler PageAdded;
@@ -354,22 +355,26 @@ namespace Pinta.Docking.DockNotebook
 				PageRemoved (this, EventArgs.Empty);
 		}
 
-		internal void ReorderTab (DockNotebookTab tab, DockNotebookTab targetTab)
+		public void ReorderTab (DockNotebookTab tab, DockNotebookTab targetTab)
 		{
 			if (tab == targetTab)
 				return;
+
+			int oldIndex = tab.Index;
 			int targetPos = targetTab.Index;
-			if (tab.Index > targetTab.Index) {
-				pages.RemoveAt (tab.Index);
-				pages.Insert (targetPos, tab);
+
+			if (oldIndex > targetPos) {
+				pages.RemoveAt(oldIndex);
+				pages.Insert(targetPos, tab);
 			} else {
-				pages.Insert (targetPos + 1, tab);
-				pages.RemoveAt (tab.Index);
+				pages.Insert(targetPos + 1, tab);
+				pages.RemoveAt(oldIndex);
 			}
-            // JONTODO
-			//IdeApp.Workbench.ReorderDocuments (tab.Index, targetPos);
-			UpdateIndexes (Math.Min (tab.Index, targetPos));
-			tabStrip.Update ();
+
+			UpdateIndexes(Math.Min(oldIndex, targetPos));
+			tabStrip.Update();
+
+			TabsReordered?.Invoke(tab, oldIndex, tab.Index);
 		}
 
         // Returns true if the tab was successfully closed

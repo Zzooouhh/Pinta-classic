@@ -2,7 +2,7 @@
 // PasteIntoNewLayerAction.cs
 //  
 // Author:
-//       Jonathan Pobst <monkey@jpobst.com>
+//	   Jonathan Pobst <monkey@jpobst.com>
 // 
 // Copyright (c) 2010 Jonathan Pobst
 // 
@@ -55,18 +55,29 @@ namespace Pinta.Actions
 				return;
 			}
 
-            var doc = PintaCore.Workspace.ActiveDocument;
+			var doc = PintaCore.Workspace.ActiveDocument;
 
-			// Get the scroll position in canvas co-ordinates
-			Gtk.Viewport view = (Gtk.Viewport)doc.Workspace.Canvas.Parent;
-			Cairo.PointD canvasPos = doc.Workspace.WindowPointToCanvas (
-				view.Hadjustment.Value,
-				view.Vadjustment.Value);
+			int pasteX = 0;
+			int pasteY = 0;
+
+			// Read directly from PintaCore
+			if (PintaCore.ClipboardOrigin != Gdk.Rectangle.Zero) {
+				pasteX = PintaCore.ClipboardOrigin.X;
+				pasteY = PintaCore.ClipboardOrigin.Y;
+			} else {
+				// Fallback logic
+				Gtk.Viewport view = (Gtk.Viewport)doc.Workspace.Canvas.Parent;
+				Cairo.PointD canvasPos = doc.Workspace.WindowPointToCanvas (
+					view.Hadjustment.Value,
+					view.Vadjustment.Value);
+				pasteX = (int) canvasPos.X;
+				pasteY = (int) canvasPos.Y;
+			}
 
 			// Paste into the active document.
 			// The 'true' argument indicates that paste should be
 			// performed into a new layer.
-			doc.Paste (true, (int) canvasPos.X, (int) canvasPos.Y);
+			doc.Paste (true, pasteX, pasteY);
 		}
 	}
 }

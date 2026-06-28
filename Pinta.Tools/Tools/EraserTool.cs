@@ -220,8 +220,141 @@ namespace Pinta.Tools
         #endregion
 
         #region Mouse Handlers
+		protected override void OnMouseUp (DrawingArea canvas, ButtonReleaseEventArgs args, PointD point)
+		{
+            last_point = point_empty; //new Cairo.Point(-1, -1); // Use (-1,-1) as a sentinel (invalid) value
+			base.OnMouseUp (canvas, args, point);
+		}
+
         protected override void OnMouseMove (object o, Gtk.MotionNotifyEventArgs args, Cairo.PointD new_pointd)
         {
+    // --- SAFETY CHECK ---
+    // If undo_surface wasn't initialized (e.g. right click or quick switch), stop.
+    if (undo_surface == null) return;
+    
+    // If the document/layer is invalid, stop.
+    if (PintaCore.Workspace.ActiveDocument == null || PintaCore.Workspace.ActiveDocument.CurrentUserLayer == null) return;
+    // --------------------
+                // --- SHIFT STRAIGHT LINE LOGIC ---
+    // 1. Initialization Check (Structs cannot be null, so check 0,0)
+    if (start_point_drawing.X == 0 && start_point_drawing.Y == 0) {
+        start_point_drawing = new_pointd;
+        last_invalidated_rect = Gdk.Rectangle.Zero;
+    }
+
+    var ev = args != null ? args.Event : null;
+    
+    bool shiftHeld = false;
+    if (ev != null && ev.Type == Gdk.EventType.MotionNotify) {
+        Gdk.EventMotion motionEvent = (Gdk.EventMotion)ev;
+        // Check raw bit 1 for Shift
+        if ((((uint)motionEvent.State) & 1) != 0) {
+            shiftHeld = true;
+        }
+    }
+    
+    bool ctrlHeld = false;
+    if (ev != null && ev.Type == Gdk.EventType.MotionNotify) {
+        Gdk.EventMotion motionEvent = (Gdk.EventMotion)ev;
+        if ((motionEvent.State & Gdk.ModifierType.ControlMask) != 0) {
+            ctrlHeld = true;
+        }
+    }
+
+    bool transition_to_shift = (!was_shift_held && shiftHeld);
+    bool transition_to_normal = (was_shift_held && !shiftHeld);
+    was_shift_held = shiftHeld;
+
+    if (shiftHeld) {
+        // FIX: Mark surface as modified so Undo works for Shift strokes
+        surface_modified = true;
+
+        // Use FULL namespaces and UNIQUE names to avoid conflicts
+        Cairo.ImageSurface gSurf = PintaCore.Workspace.ActiveDocument.CurrentUserLayer.Surface;
+        Cairo.PointD target_point = new_pointd;
+
+        if (transition_to_shift) {
+            PintaCore.Workspace.Invalidate (); // Fix ghosting
+        }
+        was_shift_held = true;
+
+        if (!ctrlHeld) {
+            target_point = GetSnappedPoint (start_point_drawing, new_pointd);
+        }
+
+        using (Cairo.Context g = new Cairo.Context (gSurf)) {
+            g.Save();
+            g.Operator = Cairo.Operator.Source; 
+            g.SetSourceSurface (undo_surface, 0, 0);
+            g.Paint ();
+            g.Restore(); // Restore previous state (for the Stroke)
+            // ----------------------
+
+            // Setup Drawing
+            g.AppendPath (PintaCore.Workspace.ActiveDocument.Selection.SelectionPath);
+            g.FillRule = Cairo.FillRule.EvenOdd;
+            g.Clip ();
+            // --- FIX ANTI-ALIASING ARTIFACTS ---
+            // Switching to Antialias.None prevents "Bleeding" pixels 
+            // and ensures the line aligns perfectly with the restored pixels.
+            // You can change this to .Default if it looks too jagged, 
+            // but .None fixes the "erased lines recede" bug.
+            g.Antialias = UseAntialiasing ? Antialias.Subpixel : Antialias.None;
+            g.LineWidth = BrushWidth;
+            g.LineCap = Cairo.LineCap.Round;
+            g.LineJoin = Cairo.LineJoin.Round;
+
+            // Special Check: Eraser Tool
+            if (this.GetType ().Name == "EraserTool") {
+                g.Operator = Cairo.Operator.DestOut;
+                g.Color = new Cairo.Color (1, 1, 1, 1); // Full Alpha
+            } else {
+                // Normal Color logic
+                if (mouse_button == 1)
+                    g.SetSourceColor (PintaCore.Palette.PrimaryColor);
+                else if (mouse_button == 3)
+                    g.SetSourceColor (PintaCore.Palette.SecondaryColor);
+
+                if (UseAlphaBlending) g.SetBlendMode(BlendMode.Normal);
+                else g.Operator = Cairo.Operator.Source;
+            }
+
+            g.MoveTo (start_point_drawing.X, start_point_drawing.Y);
+            g.LineTo (target_point.X, target_point.Y);
+            g.Stroke();
+            
+            // Update Screen
+            int x1 = (int) Math.Min(start_point_drawing.X, target_point.X);
+            int y1 = (int) Math.Min(start_point_drawing.Y, target_point.Y);
+            int x2 = (int) Math.Max(start_point_drawing.X, target_point.X);
+            int y2 = (int) Math.Max(start_point_drawing.Y, target_point.Y);
+            int pad = (int)(BrushWidth / 2) + 2;
+            Gdk.Rectangle current_rect = new Gdk.Rectangle (x1 - pad, y1 - pad, (x2 - x1) + pad * 2, (y2 - y1) + pad * 2);
+
+            if (last_invalidated_rect != Gdk.Rectangle.Zero) PintaCore.Workspace.Invalidate (last_invalidated_rect);
+            PintaCore.Workspace.Invalidate (current_rect);
+            last_invalidated_rect = current_rect;
+        }
+        return; // STOP! Don't run the original tool logic
+    } else {
+        // Fix for Dotted Lines: ONLY sync 'last_point' when we transition from Shift to Normal.
+        // Do NOT update it every frame, or we break the drawing continuity.
+        if (transition_to_normal) {
+            // Cast logic depending on the tool
+            last_point = new Cairo.Point ((int)new_pointd.X, (int)new_pointd.Y);
+        }
+
+        // 2. Sentinel Check: Fix "Connecting Lines" and "Gaps"
+        // If last_point is (-1,-1), we are at the start of a new stroke. Sync it.
+        if (last_point.X == -500 && last_point.Y == -500) {
+            last_point = new Cairo.Point ((int)new_pointd.X, (int)new_pointd.Y);
+        }
+
+        if (was_shift_held) {
+            last_invalidated_rect = Gdk.Rectangle.Zero;
+            was_shift_held = false;
+        }
+    }
             Point new_point = new Point ((int)new_pointd.X, (int)new_pointd.Y);
 
             Document doc = PintaCore.Workspace.ActiveDocument;
@@ -262,6 +395,23 @@ namespace Pinta.Tools
             }
 
             last_point = new_point;
+        }
+
+        private PointD GetSnappedPoint (PointD start, PointD end)
+        {
+            double dx = end.X - start.X;
+            double dy = end.Y - start.Y;
+            
+            if (Math.Abs(dx) < 1 && Math.Abs(dy) < 1) 
+                return end;
+
+            double angle = Math.Atan2 (dy, dx);
+            double segment = Math.PI / 12;
+            angle = Math.Round (angle / segment) * segment;
+            
+            double length = Math.Sqrt (dx * dx + dy * dy);
+            
+            return new PointD (start.X + length * Math.Cos (angle), start.Y + length * Math.Sin (angle));
         }
         #endregion
     }
