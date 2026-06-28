@@ -30,6 +30,7 @@ using Cairo;
 using Mono.Unix;
 using System.Collections.Generic;
 using Gtk;
+using System.IO;
 
 namespace Pinta.Core
 {
@@ -175,12 +176,12 @@ namespace Pinta.Core
 			return doc;
 		}
 
-		// TODO: Standardize add to recent files
 		public bool OpenFile (string file, Window parent = null)
 		{
 			bool fileOpened = false;
+			bool parentIsNull = parent == null;
 
-			if (parent == null)
+			if (parentIsNull)
 				parent = PintaCore.Chrome.MainWindow;
 
 			try {
@@ -211,13 +212,23 @@ namespace Pinta.Core
 			} catch (Exception e) {
 				ShowOpenFileErrorDialog (parent, file, e.Message, e.ToString ());
 			}
+			
+			if (fileOpened && parentIsNull && File.Exists(file)) {
+				try {
+					string uri = new Uri (System.IO.Path.GetFullPath(file)).AbsoluteUri;
+
+					RecentManager.Default.AddItem(uri);
+				} catch {
+					// Silently ignore — recent files must never break file opening
+				}
+			}
 
 			return fileOpened;
 		}
 		
-		public void ResizeImage (int width, int height)
+		public void ResizeImage (int width, int height, Cairo.Filter filter)
 		{
-			ActiveDocument.ResizeImage (width, height);
+			ActiveDocument.ResizeImage (width, height, filter);
 		}
 		
 		public void ResizeCanvas (int width, int height, Anchor anchor, CompoundHistoryItem compoundAction)
@@ -305,6 +316,24 @@ namespace Pinta.Core
 			OnActiveDocumentChanged (EventArgs.Empty);
 		}
 		
+		public void ReorderDocument(int oldIndex, int newIndex)
+		{
+			if (oldIndex < 0 || oldIndex >= OpenDocuments.Count)
+				return;
+
+			if (newIndex < 0 || newIndex >= OpenDocuments.Count)
+				return;
+
+			var doc = OpenDocuments[oldIndex];
+			OpenDocuments.RemoveAt(oldIndex);
+			OpenDocuments.Insert(newIndex, doc);
+
+			// Re-sync active document index properly
+			SetActiveDocument(doc);
+
+			DocumentReordered?.Invoke(this, EventArgs.Empty);
+		}
+		
 		#region Protected Methods
 		protected void OnActiveDocumentChanged (EventArgs e)
 		{
@@ -314,6 +343,15 @@ namespace Pinta.Core
             OnSelectionChanged ();
 				
 			ResetTitle ();
+			
+			if (HasOpenDocuments) {
+				if (PintaCore.Tools != null && PintaCore.Tools.CurrentTool != null)
+				{
+					var tool = PintaCore.Tools.CurrentTool;
+					tool.DoDeactivated(tool);
+					tool.DoActivated();
+				}
+			}
 		}
 
 		protected internal void OnDocumentCreated (DocumentEventArgs e)
@@ -381,6 +419,8 @@ namespace Pinta.Core
 			string message = string.Format (markup, primary, secondary);
 
 			var md = new MessageDialog (parent, DialogFlags.Modal, MessageType.Error, ButtonsType.Ok, message);
+            Pinta.Core.Document.MakeDialogNonInteractive(md);
+
 			md.Run ();
 			md.Destroy ();
 		}
@@ -390,6 +430,7 @@ namespace Pinta.Core
 		public event EventHandler<DocumentEventArgs> DocumentCreated;
 		public event EventHandler<DocumentEventArgs> DocumentOpened;
 		public event EventHandler<DocumentEventArgs> DocumentClosed;
+		public event EventHandler DocumentReordered;
 		public event EventHandler SelectionChanged;
 #endregion
 		

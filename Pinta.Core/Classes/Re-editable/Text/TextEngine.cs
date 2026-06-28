@@ -184,7 +184,7 @@ namespace Pinta.Core
 			OnModified ();
 		}
 
-		public void PerformBackspace ()
+		public void PerformBackspace (bool control)
 		{
 			if (HasSelection ()) {
 				DeleteSelection ();
@@ -203,14 +203,18 @@ namespace Pinta.Core
 			} else if (currentPos.Offset > 0) {
 				// We're in the middle of a line, delete the previous character
 				string ln = lines[currentPos.Line];
+				int oldOffset = currentPos.Offset;
+				
+				if (control)
+					PerformControlLeft (false);
+				else
+					currentPos.Offset--;
 
 				// If we are at the end of a line, we don't need to place a compound string
-				if (currentPos.Offset == ln.Length)
-					lines[currentPos.Line] = ln.Substring (0, ln.Length - 1);
+				if (oldOffset == ln.Length)
+					lines[currentPos.Line] = ln.Substring (0, ln.Length - (oldOffset - currentPos.Offset));
 				else
-					lines[currentPos.Line] = ln.Substring (0, currentPos.Offset - 1) + ln.Substring (currentPos.Offset);
-
-				currentPos.Offset--;
+					lines[currentPos.Line] = ln.Substring (0, oldOffset - 1) + ln.Substring (oldOffset);
 			}
 
             selectionStart = currentPos;
@@ -285,11 +289,11 @@ namespace Pinta.Core
 				} else {
 					ntp--;
 				}
+				currentPos.Offset = ntp;
 
                 if (!shift)
                     ClearSelection ();
 
-				currentPos.Offset = ntp;
 			} else if (currentPos.Offset == 0 && currentPos.Line > 0) {
 				currentPos.Line--;
 				currentPos.Offset = lines[currentPos.Line].Length;

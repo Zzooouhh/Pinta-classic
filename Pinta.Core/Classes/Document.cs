@@ -217,12 +217,9 @@ namespace Pinta.Core
 
 		public Gdk.Rectangle ClampToImageSize (Gdk.Rectangle r)
 		{
-			int x = Utility.Clamp (r.X, 0, ImageSize.Width);
-			int y = Utility.Clamp (r.Y, 0, ImageSize.Height);
-			int width = Math.Min (r.Width, ImageSize.Width - x);
-			int height = Math.Min (r.Height, ImageSize.Height - y);
+            Gdk.Rectangle imageRect = new Gdk.Rectangle (0, 0, ImageSize.Width, ImageSize.Height);
 
-			return new Gdk.Rectangle (x, y, width, height);
+            return Gdk.Rectangle.Intersect (r, imageRect);
 		}
 
 		public void Clear ()
@@ -412,10 +409,18 @@ namespace Pinta.Core
 
 			Layer layer = SelectionLayer;
 
-			using (Cairo.Context g = new Cairo.Context (CurrentUserLayer.Surface)) {
-				selection.Clip (g);
-				layer.Draw (g);
-			}
+            using (Cairo.Context g = new Cairo.Context (CurrentUserLayer.Surface)) {
+
+                selection.Clip (g);
+
+                // Clear destination pixels inside selection first
+                g.Operator = Cairo.Operator.Clear;
+                g.Paint ();
+
+                // Draw floating selection normally
+                g.Operator = Cairo.Operator.Over;
+                layer.Draw (g);
+            }
 
 			DestroySelectionLayer ();
 			Workspace.Invalidate ();
@@ -681,32 +686,33 @@ namespace Pinta.Core
 			Workspace.Scale = scale;
 		}
 		
-		public void ResizeImage (int width, int height)
+		public void ResizeImage (int width, int height, Cairo.Filter filter)
 		{
-			double scale;
+            double scale;
 
-			if (ImageSize.Width == width && ImageSize.Height == height)
-				return;
+            if (ImageSize.Width == width && ImageSize.Height == height)
+                return;
 
-			PintaCore.Tools.Commit ();
+            PintaCore.Tools.Commit ();
 
-			ResizeHistoryItem hist = new ResizeHistoryItem (ImageSize);
-			hist.StartSnapshotOfImage ();
+            ResizeHistoryItem hist = new ResizeHistoryItem (ImageSize);
+            hist.StartSnapshotOfImage ();
 
-			scale = Workspace.Scale;
+            scale = Workspace.Scale;
 
-			ImageSize = new Gdk.Size (width, height);
+            ImageSize = new Gdk.Size (width, height);
 
-			foreach (var layer in UserLayers)
-				layer.Resize (width, height);
+            foreach (var layer in UserLayers)
+                layer.Resize (width, height, filter);
 
-			hist.FinishSnapshotOfImage ();
+            hist.FinishSnapshotOfImage ();
 
-			Workspace.History.PushNewItem (hist);
+            Workspace.History.PushNewItem (hist);
 
-			ResetSelectionPaths ();
+            ResetSelectionPaths ();
 
-			Workspace.Scale = scale;
+            Workspace.Scale = scale;
+
 		}
 		
 		// Rotate image 180 degrees (flip H+V)
@@ -868,7 +874,7 @@ namespace Pinta.Core
 
 			Workspace.Invalidate ();
 
-			paste_action.Push (new PasteHistoryItem (cbImage, old_selection));
+            paste_action.Push (new PasteHistoryItem (cbImage, old_selection, new PointD(x, y)));
 			History.PushNewItem (paste_action);
 		}
 
@@ -884,6 +890,7 @@ namespace Pinta.Core
 			enlarge_dialog.AddButton (Catalog.GetString ("Don't change canvas size"), ResponseType.Reject);
 			enlarge_dialog.AddButton (Stock.Cancel, ResponseType.Cancel);
 			enlarge_dialog.DefaultResponse = ResponseType.Accept;
+            MakeDialogNonInteractive(enlarge_dialog);
 
 			ResponseType response = (ResponseType)enlarge_dialog.Run ();
 
@@ -894,9 +901,9 @@ namespace Pinta.Core
 
 		public static void ShowClipboardEmptyDialog()
 		{
-			var primary = Catalog.GetString ("Image cannot be pasted");
-			var secondary = Catalog.GetString ("The clipboard does not contain an image.");
-			var markup = "<span weight=\"bold\" size=\"larger\">{0}</span>\n\n{1}\n";
+			string primary = Catalog.GetString ("Image cannot be pasted");
+			string secondary = Catalog.GetString ("The clipboard does not contain an image.");
+			string markup = "<span weight=\"bold\" size=\"larger\">{0}</span>\n\n{1}\n";
 			markup = string.Format (markup, primary, secondary);
 
 			var md = new MessageDialog (Pinta.Core.PintaCore.Chrome.MainWindow, DialogFlags.Modal,
@@ -904,10 +911,25 @@ namespace Pinta.Core
 							markup);
 
 			md.AddButton (Stock.Ok, ResponseType.Yes);
-
+            MakeDialogNonInteractive(md);
 			md.Run ();
 			md.Destroy ();
 		}
+
+        public static void MakeDialogNonInteractive (Gtk.Container container)
+        {
+            foreach (var child in container.Children) {
+                // Check for Label
+                if (child is Gtk.Label label) {
+                    label.CanFocus = false;
+                    label.Selectable = false;
+                }
+                // Recurse into nested containers
+                else if (child is Gtk.Container cont) {
+                    MakeDialogNonInteractive (cont);
+                }
+            }
+        }
 
 		/// <summary>
 		/// Signal to the TextTool that an ImageSurface was cloned.

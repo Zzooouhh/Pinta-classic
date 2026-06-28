@@ -45,6 +45,11 @@ namespace Pinta.Core
 		public Gtk.Action MoveLayerUp { get; private set; }
 		public Gtk.Action MoveLayerDown { get; private set; }
 		public Gtk.Action Properties { get; private set; }
+        // public Gtk.Action ActivateTopLayer { get; private set; }
+        public Gtk.Action ActivateLayerAbove { get; private set; }
+        public Gtk.Action ActivateLayerBelow { get; private set; }
+        // public Gtk.Action ActivateBottomLayer { get; private set; }
+        public Gtk.Action ToggleLayerVisibility { get; private set; }
 		
 		public LayerActions ()
 		{
@@ -62,17 +67,22 @@ namespace Pinta.Core
 			fact.Add ("Menu.Layers.RotateZoom.png", new Gtk.IconSet (PintaCore.Resources.GetIcon ("Menu.Layers.RotateZoom.png")));
 			fact.AddDefault ();
 			
-			AddNewLayer = new Gtk.Action ("AddNewLayer", Catalog.GetString ("Add New Layer"), null, "Menu.Layers.AddNewLayer.png");
-			DeleteLayer = new Gtk.Action ("DeleteLayer", Catalog.GetString ("Delete Layer"), null, "Menu.Layers.DeleteLayer.png");
-			DuplicateLayer = new Gtk.Action ("DuplicateLayer", Catalog.GetString ("Duplicate Layer"), null, "Menu.Layers.DuplicateLayer.png");
-			MergeLayerDown = new Gtk.Action ("MergeLayerDown", Catalog.GetString ("Merge Layer Down"), null, "Menu.Layers.MergeLayerDown.png");
-			ImportFromFile = new Gtk.Action ("ImportFromFile", Catalog.GetString ("Import from File..."), null, "Menu.Layers.ImportFromFile.png");
-			FlipHorizontal = new Gtk.Action ("FlipHorizontal", Catalog.GetString ("Flip Horizontal"), null, "Menu.Layers.FlipHorizontal.png");
-			FlipVertical = new Gtk.Action ("FlipVertical", Catalog.GetString ("Flip Vertical"), null, "Menu.Layers.FlipVertical.png");
-			RotateZoom = new Gtk.Action ("RotateZoom", Catalog.GetString ("Rotate / Zoom Layer..."), null, "Menu.Layers.RotateZoom.png");
-			MoveLayerUp = new Gtk.Action ("MoveLayerUp", Catalog.GetString ("Move Layer Up"), null, "Menu.Layers.MoveLayerUp.png");
-			MoveLayerDown = new Gtk.Action ("MoveLayerDown", Catalog.GetString ("Move Layer Down"), null, "Menu.Layers.MoveLayerDown.png");
-			Properties = new Gtk.Action ("Properties", Catalog.GetString ("Layer Properties..."), null, "Menu.Layers.LayerProperties.png");
+			AddNewLayer = new Gtk.Action ("AddNewLayer", Catalog.GetString ("_Add New Layer"), null, "Menu.Layers.AddNewLayer.png");
+			DeleteLayer = new Gtk.Action ("DeleteLayer", Catalog.GetString ("De_lete Layer"), null, "Menu.Layers.DeleteLayer.png");
+			DuplicateLayer = new Gtk.Action ("DuplicateLayer", Catalog.GetString ("_Duplicate Layer"), null, "Menu.Layers.DuplicateLayer.png");
+			MergeLayerDown = new Gtk.Action ("MergeLayerDown", Catalog.GetString ("_Merge Layer Down"), null, "Menu.Layers.MergeLayerDown.png");
+			ImportFromFile = new Gtk.Action ("ImportFromFile", Catalog.GetString ("_Import from File..."), null, "Menu.Layers.ImportFromFile.png");
+			FlipHorizontal = new Gtk.Action ("FlipHorizontal", Catalog.GetString ("Flip _Horizontal"), null, "Menu.Layers.FlipHorizontal.png");
+			FlipVertical = new Gtk.Action ("FlipVertical", Catalog.GetString ("Flip _Vertical"), null, "Menu.Layers.FlipVertical.png");
+			RotateZoom = new Gtk.Action ("RotateZoom", Catalog.GetString ("_Rotate / _Zoom Layer..."), null, "Menu.Layers.RotateZoom.png");
+			MoveLayerUp = new Gtk.Action ("MoveLayerUp", Catalog.GetString ("Move Layer _Up"), null, "Menu.Layers.MoveLayerUp.png");
+			MoveLayerDown = new Gtk.Action ("MoveLayerDown", Catalog.GetString ("Move Layer D_own"), null, "Menu.Layers.MoveLayerDown.png");
+            // ActivateTopLayer = new Gtk.Action ("ActivateTopLayer", "Go to Top Layer", null, null);
+            ActivateLayerAbove = new Gtk.Action ("ActivateLayerAbove", "Go to Layer Above", null, null);
+            ActivateLayerBelow = new Gtk.Action ("ActivateLayerBelow", "Go to Layer Below", null, null);
+            // ActivateBottomLayer = new Gtk.Action ("ActivateBottomLayer", "Go to Bottom Layer", null, null);
+            ToggleLayerVisibility = new Gtk.Action ("ToggleLayerVisibility", "_Toggle Layer Visibility", null, null);
+			Properties = new Gtk.Action ("Properties", Catalog.GetString ("Layer _Properties..."), null, "Menu.Layers.LayerProperties.png");
 
 			RotateZoom.Sensitive = false;
 		}
@@ -89,6 +99,16 @@ namespace Pinta.Core
 			menu.Append (FlipHorizontal.CreateMenuItem ());
 			menu.Append (FlipVertical.CreateMenuItem ());
 			menu.Append (RotateZoom.CreateMenuItem ());
+			menu.Append (ToggleLayerVisibility.CreateAcceleratedMenuItem (Gdk.Key.H, Gdk.ModifierType.ControlMask | Gdk.ModifierType.ShiftMask));
+			menu.AppendSeparator ();
+			// menu.Append ((ActivateTopLayer.CreateAcceleratedMenuItem (Gdk.Key.Page_Up, Gdk.ModifierType.ControlMask | Gdk.ModifierType.Mod1Mask | Gdk.ModifierType.Mod2Mask) { Visible = false }));
+			menu.Append (ActivateLayerAbove.CreateAcceleratedMenuItem (Gdk.Key.Page_Up, Gdk.ModifierType.Mod1Mask));
+			menu.Append (ActivateLayerBelow.CreateAcceleratedMenuItem (Gdk.Key.Page_Down, Gdk.ModifierType.Mod1Mask));
+			// menu.Append ((ActivateBottomLayer.CreateAcceleratedMenuItem (Gdk.Key.Page_Down, Gdk.ModifierType.ControlMask | Gdk.ModifierType.Mod1Mask | Gdk.ModifierType.Mod2Mask) { Visible = false }));
+			menu.Append (MoveLayerUp.CreateAcceleratedMenuItem (Gdk.Key.Page_Up, Gdk.ModifierType.ControlMask | Gdk.ModifierType.Mod1Mask));
+			menu.Append (MoveLayerDown.CreateAcceleratedMenuItem (Gdk.Key.Page_Down, Gdk.ModifierType.ControlMask | Gdk.ModifierType.Mod1Mask));
+			// menu.Append (MoveLayerUp.CreateMenuItem ());
+			// menu.Append (MoveLayerDown.CreateMenuItem ());
 			menu.AppendSeparator ();
 			menu.Append (Properties.CreateAcceleratedMenuItem (Gdk.Key.F4, Gdk.ModifierType.None));
 		}
@@ -115,6 +135,11 @@ namespace Pinta.Core
 			FlipHorizontal.Activated += HandlePintaCoreActionsLayersFlipHorizontalActivated;
 			FlipVertical.Activated += HandlePintaCoreActionsLayersFlipVerticalActivated;
 			ImportFromFile.Activated += HandlePintaCoreActionsLayersImportFromFileActivated;
+            // ActivateTopLayer.Activated += (s, e) => PintaCore.Layers.ActivateTopLayer ();
+            ActivateLayerAbove.Activated += (s, e) => PintaCore.Layers.ActivateLayerAbove ();
+            ActivateLayerBelow.Activated += (s, e) => PintaCore.Layers.ActivateLayerBelow ();
+            // ActivateBottomLayer.Activated += (s, e) => PintaCore.Layers.ActivateBottomLayer ();
+            ToggleLayerVisibility.Activated += HandlePintaCoreActionsLayersToggleLayerVisibilityActivated;
 			
 			PintaCore.Layers.LayerAdded += EnableOrDisableLayerActions;
 			PintaCore.Layers.LayerRemoved += EnableOrDisableLayerActions;
@@ -292,6 +317,28 @@ namespace Pinta.Core
 			AddLayerHistoryItem hist = new AddLayerHistoryItem ("Menu.Layers.AddNewLayer.png", Catalog.GetString ("Add New Layer"), doc.UserLayers.IndexOf (l));
 			doc.History.PushNewItem (hist);
 		}
+        
+        private void HandlePintaCoreActionsLayersToggleLayerVisibilityActivated (object sender, EventArgs e)
+        {
+            var layer = PintaCore.Layers.CurrentLayer as UserLayer;
+            bool visibility = layer.Hidden;
+            if (layer != null)
+                layer.Hidden = !visibility;
+            
+            var initial = new LayerProperties(layer.Name, visibility, layer.Opacity, layer.BlendMode);
+            var updated = new LayerProperties(layer.Name, !visibility, layer.Opacity, layer.BlendMode);
+
+            var historyItem = new UpdateLayerPropertiesHistoryItem (
+                "Menu.Layers.LayerProperties.png",
+                (visibility) ? Catalog.GetString ("Layer Shown") : Catalog.GetString ("Layer Hidden"),
+                PintaCore.Layers.IndexOf (layer),
+                initial,
+                updated);
+
+            PintaCore.History.PushNewItem (historyItem);
+
+            PintaCore.Workspace.Invalidate ();
+        }
 		#endregion
 	}
 }

@@ -60,7 +60,7 @@ namespace Pinta.Core
 				Gtk.Viewport view = (Gtk.Viewport)Canvas.Parent;
 				
 				int window_x = view.Allocation.Width;
-				int window_y = view.Children[0].Allocation.Height;
+				int window_y = view.Allocation.Height;
 				
 				if (CanvasSize.Width <= window_x && CanvasSize.Height <= window_y)
 					return true;
@@ -86,8 +86,8 @@ namespace Pinta.Core
 				Gtk.Viewport view = (Gtk.Viewport)Canvas.Parent;
 				
 				int window_x = view.Allocation.Width;
-				int window_y = view.Children[0].Allocation.Height;
-				
+				int window_y = view.Allocation.Height;
+
 				if (document.ImageSize.Width <= window_x && document.ImageSize.Height <= window_y)
 					return true;
 				
@@ -174,13 +174,23 @@ namespace Pinta.Core
 			return true;
 		}
 
-		public void RecenterView (double x, double y)
-		{
-			Gtk.Viewport view = (Gtk.Viewport)Canvas.Parent;
-			
-			view.Hadjustment.Value = Utility.Clamp (x * Scale - view.Hadjustment.PageSize / 2, view.Hadjustment.Lower, view.Hadjustment.Upper);
-			view.Vadjustment.Value = Utility.Clamp (y * Scale - view.Vadjustment.PageSize / 2, view.Vadjustment.Lower, view.Vadjustment.Upper);
-		}
+        public void RecenterView (double x, double y)
+        {
+            Gtk.Viewport view = (Gtk.Viewport)Canvas.Parent;
+
+            double maxH = view.Hadjustment.Upper - view.Hadjustment.PageSize;
+            double maxV = view.Vadjustment.Upper - view.Vadjustment.PageSize;
+
+            view.Hadjustment.Value = Utility.Clamp(
+                x * Scale - view.Hadjustment.PageSize / 2,
+                view.Hadjustment.Lower,
+                maxH);
+
+            view.Vadjustment.Value = Utility.Clamp(
+                y * Scale - view.Vadjustment.PageSize / 2,
+                view.Vadjustment.Lower,
+                maxV);
+        }
 
 		public void ScrollCanvas (int dx, int dy)
 		{

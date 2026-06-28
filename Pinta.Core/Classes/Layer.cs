@@ -216,23 +216,32 @@ namespace Pinta.Core
 			(dest as IDisposable).Dispose ();
 		}
 
-		public virtual void Resize (int width, int height)
-		{
-			ImageSurface dest = CairoExtensions.CreateImageSurface (Format.Argb32, width, height);
+        public virtual void Resize (int width, int height, Cairo.Filter filter)
+        {
+            ImageSurface dest = CairoExtensions.CreateImageSurface (Format.Argb32, width, height);
 
-			Pixbuf pb = Surface.ToPixbuf();
-			Pixbuf pbScaled = pb.ScaleSimple (width, height, InterpType.Bilinear);
+            Pixbuf pb = Surface.ToPixbuf();
+            
+            Gdk.InterpType interp = Gdk.InterpType.Bilinear; // Default (Good)
+            
+            if (filter == Cairo.Filter.Fast)
+                interp = Gdk.InterpType.Nearest;    // Nearest Neighbor
+            else if (filter == Cairo.Filter.Best)
+                interp = Gdk.InterpType.Hyper;      // Bicubic (High Quality)
 
-			using (Context g = new Context (dest)) {
-				CairoHelper.SetSourcePixbuf (g, pbScaled, 0, 0);
-				g.Paint ();
-			}
+            Pixbuf pbScaled = pb.ScaleSimple (width, height, interp);
 
-			(Surface as IDisposable).Dispose ();
-			(pb as IDisposable).Dispose ();
-			(pbScaled as IDisposable).Dispose ();
-			Surface = dest;
-		}
+            using (Context g = new Context (dest)) {
+                CairoHelper.SetSourcePixbuf (g, pbScaled, 0, 0);
+                g.Paint ();
+            }
+
+            (Surface as IDisposable).Dispose ();
+            (pb as IDisposable).Dispose ();
+            (pbScaled as IDisposable).Dispose ();
+            Surface = dest;
+        }
+
 
 		public virtual void ResizeCanvas (int width, int height, Anchor anchor)
 		{

@@ -50,21 +50,44 @@ namespace Pinta.Core
 		protected ToolItem tool_label;
 		protected ToolItem tool_image;
 		protected ToolItem tool_sep;
-		protected ToolBarDropDownButton antialiasing_button;
-		private ToolBarItem aaOn, aaOff;
+		protected ToolBarLabel antialiasing_label;
+		protected ToolBarButton antialiasing_button;
+        private bool use_antialiasing;
+        private Gtk.Image aa_on_img;
+        private Gtk.Image aa_off_img;
+        private const string AntialiasingSettingKey = "antialiasing-enabled";
 		protected ToolBarDropDownButton alphablending_button;
 		private ToolBarItem abOn, abOff;
 		public event MouseHandler MouseMoved;
 		public event MouseHandler MousePressed;
 		public event MouseHandler MouseReleased;
+        protected uint mouse_button;
 
+		protected static bool force_reselect = false;
         public Cursor CurrentCursor { get; private set; }
+
+		protected ToolBarLabel mode_label;
+		protected ToolBarButton mode_button;
+        private bool is_global;
+        private Gtk.Image ug_on_img;
+        private Gtk.Image ug_off_img;
+        private const string GlobalSettingKey = "global-enabled";
+        
 
 		protected BaseTool ()
 		{
             CurrentCursor = DefaultCursor;
 
             PintaCore.Workspace.ActiveDocumentChanged += Workspace_ActiveDocumentChanged;
+            
+            use_antialiasing = PintaCore.Settings.GetSetting<bool> (
+                AntialiasingSettingKey,
+                true   // default value
+            );
+            is_global = PintaCore.Settings.GetSetting<bool> (
+                GlobalSettingKey,
+                false   // default value
+            );
 		}
 
 		static BaseTool ()
@@ -90,23 +113,55 @@ namespace Pinta.Core
 		//Whether or not the tool is an editable ShapeTool.
 		public bool IsEditableShapeTool = false;
 
-		public virtual bool UseAntialiasing
-		{
-			get
-			{
-                return (antialiasing_button != null) &&
-                        ShowAntialiasingButton &&
-                        (bool)antialiasing_button.SelectedItem.Tag;
-			}
-
-			set
-			{
-			    if (!ShowAntialiasingButton || antialiasing_button == null)
+        public virtual bool UseAntialiasing
+        {
+            get
+            {
+                return ShowAntialiasingButton && use_antialiasing;
+            }
+            set
+            {
+                if (!ShowAntialiasingButton)
                     return;
 
-			    antialiasing_button.SelectedItem = value ? aaOn : aaOff;
-			}
-		}
+                if (use_antialiasing == value)
+                    return;
+
+                use_antialiasing = value;
+
+                PintaCore.Settings.PutSetting (
+                    AntialiasingSettingKey,
+                    use_antialiasing
+                );
+
+                UpdateAntialiasingButton ();
+            }
+        }
+
+        protected virtual bool UseGlobalMode
+        {
+            get
+            {
+                return ShowGlobalButton && is_global;
+            }
+            set
+            {
+                if (!ShowGlobalButton)
+                    return;
+
+                if (is_global == value)
+                    return;
+
+                is_global = value;
+
+                PintaCore.Settings.PutSetting (
+                    GlobalSettingKey,
+                    is_global
+                );
+
+                UpdateGlobalButton ();
+            }
+        }
 
 		public virtual bool UseAlphaBlending
 		{
@@ -130,6 +185,7 @@ namespace Pinta.Core
 		public virtual bool CursorChangesOnZoom { get { return false; } }
 
 		protected virtual bool ShowAntialiasingButton { get { return false; } }
+		protected virtual bool ShowGlobalButton { get { return false; } }
 		protected virtual bool ShowAlphaBlendingButton { get { return false; } }
 		
 		#region Public Methods
@@ -155,6 +211,21 @@ namespace Pinta.Core
 		{
 			if (MousePressed != null)
 				MousePressed (point.X, point.Y, args.Event.State);
+
+            if (args != null) {
+                if (args.Event.Button == 2) { // Check for middle mouse button
+                    PintaCore.Tools.SetCurrentTool(Catalog.GetString("Pan"));
+                    force_reselect = true;
+                    PintaCore.Tools.CurrentTool.OnMouseDown(canvas, args, point);
+                    return;
+                } else if ((args.Event.State & Gdk.ModifierType.Mod1Mask) != 0) { // Check for Alt (Mod1Mask)
+                    PintaCore.Tools.SetCurrentTool(Catalog.GetString("Color Picker"));
+                    force_reselect = true;
+                    PintaCore.Tools.CurrentTool.OnMouseDown(canvas, args, point);
+                    return;
+                }
+            }
+
 			OnMouseDown (canvas, args, point);
 		}
 
@@ -163,6 +234,10 @@ namespace Pinta.Core
 			if (MouseReleased != null)
 				MouseReleased (point.X, point.Y, args.Event.State);
 			OnMouseUp (canvas, args, point);
+
+            if (force_reselect) {
+                PintaCore.Tools.SetCurrentTool(PintaCore.Tools.PreviousTool);
+            }
 		}
 
 		public void DoCommit ()
@@ -182,9 +257,10 @@ namespace Pinta.Core
 		
 		public void DoDeactivated (BaseTool newTool)
 		{
+			force_reselect = false;
 			OnDeactivated(newTool);
-		}		
-		
+		}
+
 		// Return true if the key was consumed.
 		public void DoKeyPress (DrawingArea canvas, KeyPressEventArgs args)
 		{
@@ -240,11 +316,13 @@ namespace Pinta.Core
 
 		protected virtual void BuildRasterizationToolItems (Toolbar tb)
 		{
-			if (ShowAlphaBlendingButton || ShowAntialiasingButton)
+			if (ShowAntialiasingButton || ShowGlobalButton || ShowAlphaBlendingButton)
 				tb.AppendItem (new SeparatorToolItem ());
 			
 			if (ShowAntialiasingButton)
 				BuildAntialiasingTool (tb);
+            if (ShowGlobalButton)    
+                BuildGlobalTool (tb);
 			if (ShowAlphaBlendingButton)
 				BuildAlphaBlending(tb);
 
@@ -281,7 +359,7 @@ namespace Pinta.Core
 		}
 
 		protected virtual void OnMouseDown (DrawingArea canvas, Gtk.ButtonPressEventArgs args, Cairo.PointD point)
-		{
+        {
 		}
 
 		protected virtual void OnMouseUp (DrawingArea canvas, Gtk.ButtonReleaseEventArgs args, Cairo.PointD point)
@@ -290,6 +368,19 @@ namespace Pinta.Core
 		
 		protected virtual void OnKeyDown (DrawingArea canvas, Gtk.KeyPressEventArgs args)
 		{
+			var doc = PintaCore.Workspace.ActiveDocument;
+			Gdk.Key kp = args.Event.Key;
+			if (doc.Selection != null && doc.Selection.Visible) {
+				if (kp == Gdk.Key.Left || kp == Gdk.Key.Right || kp == Gdk.Key.Up || kp == Gdk.Key.Down) {
+					PintaCore.Tools.SetCurrentTool(Catalog.GetString("Move Selected Pixels"));
+					PintaCore.Tools.CurrentTool.OnKeyDown(canvas, args);
+					return;
+				}
+				if (kp == Gdk.Key.Return || kp == Gdk.Key.space || kp == Gdk.Key.KP_Enter || kp == Gdk.Key.Escape) {
+					PintaCore.Actions.Edit.Deselect.Activate ();
+					return;
+				}
+			}
 		}
 
 		protected virtual void OnKeyUp (DrawingArea canvas, Gtk.KeyReleaseEventArgs args)
@@ -449,20 +540,88 @@ namespace Pinta.Core
 			tb.AppendItem (alphablending_button);
 		}
 
-		private void BuildAntialiasingTool (Toolbar tb)
-		{
-			if (antialiasing_button != null) {
-				tb.AppendItem (antialiasing_button);
-				return;
+        private void BuildAntialiasingTool (Toolbar tb)
+        {
+			if (antialiasing_label == null)
+				antialiasing_label = new ToolBarLabel (string.Format (" {0}: ", Catalog.GetString ("Antialiasing")));
+
+			tb.AppendItem (antialiasing_label);
+
+            if (antialiasing_button == null) {
+
+                antialiasing_button = new ToolBarButton ("", "", Catalog.GetString ("Antialiasing"));
+                antialiasing_button.Clicked += (s, e) => {
+                    UseAntialiasing = !UseAntialiasing;
+                };
+
+                aa_on_img = new Gtk.Image (
+                    PintaCore.Resources.GetIcon ("Toolbar.AntiAliasingEnabledIcon.png", 16)
+                );
+                aa_off_img = new Gtk.Image (
+                    PintaCore.Resources.GetIcon ("Toolbar.AntiAliasingDisabledIcon.png", 16)
+                );
+
+                UpdateAntialiasingButton ();
+            }
+
+            tb.AppendItem (antialiasing_button);
+        }
+        
+        private void UpdateAntialiasingButton ()
+        {
+            if (antialiasing_button == null)
+                return;
+
+            antialiasing_button.IconWidget =
+                use_antialiasing ? aa_on_img : aa_off_img;
+
+            antialiasing_button.IconWidget.Show ();
+
+            antialiasing_button.TooltipText = use_antialiasing
+                ? Catalog.GetString ("Antialiasing On")
+                : Catalog.GetString ("Antialiasing Off");
+        }
+        
+        private void BuildGlobalTool (Toolbar tb)
+        {
+			if (mode_label == null)
+				mode_label = new ToolBarLabel (string.Format (" {0}: ", Catalog.GetString ("Flood Mode")));
+
+			tb.AppendItem (mode_label);
+
+			if (mode_button == null) {
+				mode_button = new ToolBarButton ("", "", Catalog.GetString ("Flood Mode"));
+                mode_button.Clicked += (s, e) => {
+                    UseGlobalMode = !UseGlobalMode;
+                };
+
+                ug_on_img = new Gtk.Image (
+                    PintaCore.Resources.GetIcon ("Menu.Help.Website.png", 16)
+                );
+                ug_off_img = new Gtk.Image (
+                    PintaCore.Resources.GetIcon ("Tools.FreeformShape.png", 16)
+                );
+
+                UpdateGlobalButton ();
 			}
 
-			antialiasing_button = new ToolBarDropDownButton ();
+			tb.AppendItem (mode_button);
+        }
 
-			aaOn = antialiasing_button.AddItem (Catalog.GetString ("Antialiasing On"), "Toolbar.AntiAliasingEnabledIcon.png", true);
-			aaOff = antialiasing_button.AddItem (Catalog.GetString ("Antialiasing Off"), "Toolbar.AntiAliasingDisabledIcon.png", false);
+        private void UpdateGlobalButton ()
+        {
+            if (mode_button == null)
+                return;
 
-			tb.AppendItem (antialiasing_button);
-		}
+            mode_button.IconWidget =
+                is_global ? ug_on_img : ug_off_img;
+
+            mode_button.IconWidget.Show ();
+
+            mode_button.TooltipText = is_global
+                ? Catalog.GetString ("Global")
+                : Catalog.GetString ("Contiguous");
+        }
 
 		private void Workspace_ActiveDocumentChanged (object sender, EventArgs e)
 		{
