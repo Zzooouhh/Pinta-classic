@@ -429,9 +429,9 @@ namespace Pinta.Effects
 		{
 			ColorBgra max = ColorBgra.Black;
 
-			max.Bgra |= mask[0] ? (uint)0xFF0000 : 0;
+			max.Bgra |= mask[0] ? (uint)0xFF : 0;
 			max.Bgra |= mask[1] ? (uint)0xFF00 : 0;
-			max.Bgra |= mask[2] ? (uint)0xFF : 0;
+			max.Bgra |= mask[2] ? (uint)0xFF0000 : 0;
 			
 			Color maxcolor = max.ToCairoColor ();
 			gradientInput.MaxColor = maxcolor;
@@ -447,7 +447,7 @@ namespace Pinta.Effects
 		
 		private void HandleCheckRedToggled (object sender, EventArgs e)
 		{
-			mask [0] = checkRed.Active;
+			mask [2] = checkRed.Active;
 			MaskChanged();
 		}
 		
@@ -459,7 +459,7 @@ namespace Pinta.Effects
 
 		private void HandleCheckBlueToggled (object sender, EventArgs e)
 		{
-			mask [2] = checkBlue.Active;
+			mask [0] = checkBlue.Active;
 			MaskChanged ();
 		}
 		

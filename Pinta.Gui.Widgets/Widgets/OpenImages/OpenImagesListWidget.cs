@@ -93,9 +93,10 @@ namespace Pinta.Gui.Widgets
 			ShowAll ();
 
 			PintaCore.Workspace.DocumentOpened += HandleDocumentOpenedOrClosed;
-			PintaCore.Workspace.DocumentClosed += HandleDocumentOpenedOrClosed;
+			PintaCore.Workspace.DocumentClosed += HandleDocRenamed;
 			PintaCore.Workspace.DocumentCreated += HandleDocumentOpenedOrClosed;
 			PintaCore.Workspace.ActiveDocumentChanged += HandleActiveDocumentChanged;
+			PintaCore.Workspace.DocumentReordered += HandleDocRenamed;
 
 			// update the thumbnails whenever the image is modified
 			PintaCore.History.HistoryItemAdded += HandleDocumentModified;
@@ -236,4 +237,3 @@ namespace Pinta.Gui.Widgets
 		}
 	}
 }
-
