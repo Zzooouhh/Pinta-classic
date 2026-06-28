@@ -58,73 +58,73 @@ msgid "Add-in Manager"
 msgstr "Add-in Manager"
 
 #: ../Pinta.Core/Actions/EditActions.cs:69
-msgid "Undo"
+msgid "_Undo"
 msgstr "Desegin"
 
 #: ../Pinta.Core/Actions/EditActions.cs:70
-msgid "Redo"
+msgid "_Redo"
 msgstr "Berregin"
 
 #: ../Pinta.Core/Actions/EditActions.cs:71
 #: ../Pinta.Core/Actions/EditActions.cs:229
-msgid "Cut"
+msgid "Cu_t"
 msgstr "Moztu"
 
 #: ../Pinta.Core/Actions/EditActions.cs:72
-msgid "Copy"
+msgid "_Copy"
 msgstr "Kopiatu"
 
 #: ../Pinta.Core/Actions/EditActions.cs:73
-msgid "Copy Merged"
-msgstr "Copy Merged"
+msgid "Copy _Merged"
+msgstr "Copy _Merged"
 
 #: ../Pinta.Core/Actions/EditActions.cs:74
 #: ../Pinta.Core/Classes/Document.cs:787
 #: ../Pinta.Core/HistoryItems/PasteHistoryItem.cs:43
-msgid "Paste"
+msgid "_Paste"
 msgstr "Itsatsi"
 
 #: ../Pinta.Core/Actions/EditActions.cs:75
 #: ../Pinta.Core/Classes/Document.cs:783
-msgid "Paste Into New Layer"
+msgid "Paste Into New _Layer"
 msgstr "Itsatsi geruza berrian"
 
 #: ../Pinta.Core/Actions/EditActions.cs:76
-msgid "Paste Into New Image"
+msgid "Paste Into New I_mage"
 msgstr "Itsatsi irudi berrian"
 
 #: ../Pinta.Core/Actions/EditActions.cs:77
 #: ../Pinta.Core/Actions/EditActions.cs:231
-msgid "Erase Selection"
+msgid "_Erase Selection"
 msgstr "Ezabatu hautapena"
 
 #: ../Pinta.Core/Actions/EditActions.cs:78
 #: ../Pinta.Core/Actions/EditActions.cs:191
-msgid "Fill Selection"
+msgid "_Fill Selection"
 msgstr "Bete hautapena"
 
 #: ../Pinta.Core/Actions/EditActions.cs:79
 #: ../Pinta.Core/Actions/EditActions.cs:422
-msgid "Invert Selection"
+msgid "_Invert Selection"
 msgstr "Alderantzikatu hautapena"
 
 #: ../Pinta.Core/Actions/EditActions.cs:80
 #: ../Pinta.Core/Actions/EditActions.cs:200
-msgid "Select All"
+msgid "_Select All"
 msgstr "Hautatu dena"
 
 #: ../Pinta.Core/Actions/EditActions.cs:81
-msgid "Deselect All"
+msgid "_Deselect All"
 msgstr "Desautatu dena"
 
 #: ../Pinta.Core/Actions/EditActions.cs:83
 #: ../Pinta.Core/Actions/FileActions.cs:56
-msgid "Open..."
+msgid "_Open..."
 msgstr "Ireki..."
 
 #: ../Pinta.Core/Actions/EditActions.cs:84
 #: ../Pinta.Core/Actions/FileActions.cs:68
-msgid "Save As..."
+msgid "Save _As..."
 msgstr "Gorde honela..."
 
 #: ../Pinta.Core/Actions/EditActions.cs:85
@@ -137,7 +137,7 @@ msgstr "Ezarri kolore-kopurua"
 
 #: ../Pinta.Core/Actions/EditActions.cs:127 ../Pinta/Pads/ColorPalettePad.cs:42
 #: ../Pinta/Pads/ColorPalettePad.cs:49
-msgid "Palette"
+msgid "P_alette"
 msgstr "Paleta"
 
 #: ../Pinta.Core/Actions/EditActions.cs:240
@@ -162,32 +162,32 @@ msgid "Save Palette File"
 msgstr "Gorde paleta-fitxategia"
 
 #: ../Pinta.Core/Actions/FileActions.cs:54
-msgid "New..."
+msgid "_New..."
 msgstr "Berria..."
 
 #: ../Pinta.Core/Actions/FileActions.cs:55
-msgid "New Screenshot..."
+msgid "New Screensho_t..."
 msgstr "Pantaila-argazki berria..."
 
 #: ../Pinta.Core/Actions/FileActions.cs:57
-msgid "Open Recent"
+msgid "Open _Recent"
 msgstr ""
 
 #: ../Pinta.Core/Actions/FileActions.cs:66
 #: ../Pinta.Docking/DockLibrary/DockItemTitleTab.cs:175
-msgid "Close"
+msgid "_Close"
 msgstr "Itxi"
 
 #: ../Pinta.Core/Actions/FileActions.cs:67
-msgid "Save"
+msgid "_Save"
 msgstr "Gorde"
 
 #: ../Pinta.Core/Actions/FileActions.cs:69
-msgid "Print"
+msgid "_Print"
 msgstr "Inprimatu"
 
 #: ../Pinta.Core/Actions/FileActions.cs:70
-msgid "Quit"
+msgid "_Quit"
 msgstr "Irten"
 
 #: ../Pinta.Core/Actions/FileActions.cs:72
@@ -199,113 +199,113 @@ msgid "Open"
 msgstr "Ireki"
 
 #: ../Pinta.Core/Actions/HelpActions.cs:52
-msgid "Contents"
+msgid "_Contents"
 msgstr "Edukia"
 
 #: ../Pinta.Core/Actions/HelpActions.cs:53
-msgid "Pinta Website"
+msgid "Pinta _Website"
 msgstr "Pinta-ren webgunea"
 
 #: ../Pinta.Core/Actions/HelpActions.cs:54
-msgid "File a Bug"
+msgid "File a _Bug"
 msgstr "Jakinarazi akatsa"
 
 #: ../Pinta.Core/Actions/HelpActions.cs:55
-msgid "Translate This Application"
+msgid "_Translate This Application"
 msgstr "Itzuli aplikazio hau"
 
 #: ../Pinta.Core/Actions/HelpActions.cs:56 ../Pinta/MainWindow.cs:368
-msgid "About"
+msgid "_About"
 msgstr "Honi buruz"
 
 #: ../Pinta.Core/Actions/ImageActions.cs:60
 #: ../Pinta.Core/Actions/ImageActions.cs:284
-msgid "Crop to Selection"
+msgid "Cro_p to Selection"
 msgstr "Moztu hautapenera"
 
 #: ../Pinta.Core/Actions/ImageActions.cs:61
-msgid "Auto Crop"
+msgid "_Auto Crop"
 msgstr "Automatikoki moztu"
 
 #: ../Pinta.Core/Actions/ImageActions.cs:62
-msgid "Resize Image..."
+msgid "_Resize Image..."
 msgstr "Aldatu irudiaren tamaina..."
 
 #: ../Pinta.Core/Actions/ImageActions.cs:63
-msgid "Resize Canvas..."
+msgid "Canvas _Size..."
 msgstr "Aldatu mihisearen tamaina..."
 
 #: ../Pinta.Core/Actions/ImageActions.cs:64
 #: ../Pinta.Core/Actions/LayerActions.cs:70
-msgid "Flip Horizontal"
+msgid "Flip _Horizontal"
 msgstr "Irauli horizontalki"
 
 #: ../Pinta.Core/Actions/ImageActions.cs:65
 #: ../Pinta.Core/Actions/LayerActions.cs:71
-msgid "Flip Vertical"
+msgid "Flip _Vertical"
 msgstr "Irauli bertikalki"
 
 #: ../Pinta.Core/Actions/ImageActions.cs:66
 #: ../Pinta.Core/HistoryItems/InvertHistoryItem.cs:62
-msgid "Rotate 90° Clockwise"
+msgid "Rotate 9_0° Clockwise"
 msgstr "Biratu 90º eskuinetara"
 
 #: ../Pinta.Core/Actions/ImageActions.cs:67
 #: ../Pinta.Core/HistoryItems/InvertHistoryItem.cs:66
-msgid "Rotate 90° Counter-Clockwise"
+msgid "Rotate _90° Counter-Clockwise"
 msgstr "Biratu 90º ezkerretara"
 
 #: ../Pinta.Core/Actions/ImageActions.cs:68
 #: ../Pinta.Core/HistoryItems/InvertHistoryItem.cs:50
-msgid "Rotate 180°"
+msgid "Rotate 1_80°"
 msgstr "Biratu 180º"
 
 #: ../Pinta.Core/Actions/ImageActions.cs:69
 #: ../Pinta.Core/Actions/ImageActions.cs:146
-msgid "Flatten"
+msgid "_Flatten"
 msgstr "Berdindu"
 
 #: ../Pinta.Core/Actions/LayerActions.cs:65
 #: ../Pinta.Core/Actions/LayerActions.cs:292
 #: ../Pinta.Core/Classes/Document.cs:846
-msgid "Add New Layer"
+msgid "_Add New Layer"
 msgstr "Gehitu geruza berria"
 
 #: ../Pinta.Core/Actions/LayerActions.cs:66
 #: ../Pinta.Core/Actions/LayerActions.cs:275
-msgid "Delete Layer"
+msgid "De_lete Layer"
 msgstr "Ezabatu geruza"
 
 #: ../Pinta.Core/Actions/LayerActions.cs:67
 #: ../Pinta.Core/Actions/LayerActions.cs:266
-msgid "Duplicate Layer"
+msgid "_Duplicate Layer"
 msgstr "Bikoiztu geruza"
 
 #: ../Pinta.Core/Actions/LayerActions.cs:68
 #: ../Pinta.Core/Actions/LayerActions.cs:244
-msgid "Merge Layer Down"
+msgid "_Merge Layer Down"
 msgstr "Batu geruza beherantz"
 
 #: ../Pinta.Core/Actions/LayerActions.cs:69
-msgid "Import from File..."
+msgid "_Import from File..."
 msgstr "Inportatu fitxategitik..."
 
 #: ../Pinta.Core/Actions/LayerActions.cs:72
-msgid "Rotate / Zoom Layer..."
+msgid "_Rotate / _Zoom Layer..."
 msgstr "Biratu / Zoom geruzara..."
 
 #: ../Pinta.Core/Actions/LayerActions.cs:73
 #: ../Pinta.Core/Actions/LayerActions.cs:219
-msgid "Move Layer Up"
+msgid "Move Layer _Up"
 msgstr "Mugitu geruza gora"
 
 #: ../Pinta.Core/Actions/LayerActions.cs:74
 #: ../Pinta.Core/Actions/LayerActions.cs:230
-msgid "Move Layer Down"
+msgid "Move Layer D_own"
 msgstr "Mugitu geruza behera"
 
 #: ../Pinta.Core/Actions/LayerActions.cs:75
-msgid "Layer Properties..."
+msgid "Layer _Properties..."
 msgstr "Geruzaren propietateak..."
 
 #: ../Pinta.Core/Actions/LayerActions.cs:157
@@ -318,39 +318,39 @@ msgid "Import From File"
 msgstr "Inportatu fitxategitik"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:77
-msgid "Zoom In"
+msgid "Zoom _In"
 msgstr "Handiagotu"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:78
-msgid "Zoom Out"
+msgid "Zoom _Out"
 msgstr "Txikiagotu"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:79
-msgid "Best Fit"
+msgid "_Best Fit"
 msgstr "Egokiena"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:80
-msgid "Zoom to Selection"
+msgid "Zoom to _Selection"
 msgstr "Zooma hautapenera"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:81
-msgid "Normal Size"
+msgid "_Normal Size"
 msgstr "Tamaina normala"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:82
-msgid "Toolbar"
+msgid "_Toolbar"
 msgstr "Tresna-barra"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:83
-msgid "Image Tabs"
+msgid "Im_age Tabs"
 msgstr "Irudi-fitxak"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:84
-msgid "Pixel Grid"
+msgid "Pixel _Grid"
 msgstr "Pixel-sareta"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:85
-msgid "Rulers"
+msgid "_Rulers"
 msgstr "Erregelak"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:86
@@ -366,7 +366,7 @@ msgid "Centimeters"
 msgstr "Zentimetroak"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:89
-msgid "Fullscreen"
+msgid "_Fullscreen"
 msgstr "Pantaila osoa"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:115
@@ -377,7 +377,7 @@ msgid "Window"
 msgstr "Leihoa"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:163
-msgid "Ruler Units"
+msgid "Ruler _Units"
 msgstr "Erregelen unitateak"
 
 #. Translators: This specifies the format of the zoom percentage choices
@@ -388,11 +388,11 @@ msgid "{0}%"
 msgstr "% {0}"
 
 #: ../Pinta.Core/Actions/WindowActions.cs:45
-msgid "Save All"
+msgid "_Save All"
 msgstr "Gorde dena"
 
 #: ../Pinta.Core/Actions/WindowActions.cs:46
-msgid "Close All"
+msgid "_Close All"
 msgstr "Itxi dena"
 
 #: ../Pinta.Core/Classes/BaseTool.cs:262
@@ -2157,7 +2157,7 @@ msgid "_Window"
 msgstr "Lei_hoa"
 
 #: ../Pinta/MainWindow.cs:346
-msgid "Tool Windows"
+msgid "Tool _Windows"
 msgstr "Tresna-leihoak"
 
 #: ../Pinta/MainWindow.cs:350
@@ -2190,7 +2190,7 @@ msgid "Canvas"
 msgstr "Oihala"
 
 #: ../Pinta/Pads/HistoryPad.cs:43 ../Pinta/Pads/HistoryPad.cs:52
-msgid "History"
+msgid "_History"
 msgstr "Historia"
 
 #: ../Pinta/Pads/LayersPad.cs:43 ../Pinta/Pads/LayersPad.cs:56
@@ -2198,11 +2198,11 @@ msgid "Layers"
 msgstr "Geruzak"
 
 #: ../Pinta/Pads/OpenImagesPad.cs:41 ../Pinta/Pads/OpenImagesPad.cs:48
-msgid "Images"
+msgid "_Images"
 msgstr ""
 
 #: ../Pinta/Pads/ToolBoxPad.cs:42 ../Pinta/Pads/ToolBoxPad.cs:49
-msgid "Tools"
+msgid "_Tools"
 msgstr ""
 
 #: Polar Inversion dialog

@@ -53,73 +53,73 @@ msgid "Add-in Manager"
 msgstr "مدير الإضافات"
 
 #: ../Pinta.Core/Actions/EditActions.cs:69
-msgid "Undo"
+msgid "_Undo"
 msgstr "تراجع"
 
 #: ../Pinta.Core/Actions/EditActions.cs:70
-msgid "Redo"
+msgid "_Redo"
 msgstr "كَرِّر"
 
 #: ../Pinta.Core/Actions/EditActions.cs:71
 #: ../Pinta.Core/Actions/EditActions.cs:229
-msgid "Cut"
+msgid "Cu_t"
 msgstr "قُصّ"
 
 #: ../Pinta.Core/Actions/EditActions.cs:72
-msgid "Copy"
+msgid "_Copy"
 msgstr "انسخ"
 
 #: ../Pinta.Core/Actions/EditActions.cs:73
-msgid "Copy Merged"
+msgid "Copy _Merged"
 msgstr "انسخ ما دُمج"
 
 #: ../Pinta.Core/Actions/EditActions.cs:74
 #: ../Pinta.Core/Classes/Document.cs:787
 #: ../Pinta.Core/HistoryItems/PasteHistoryItem.cs:43
-msgid "Paste"
+msgid "_Paste"
 msgstr "الصق"
 
 #: ../Pinta.Core/Actions/EditActions.cs:75
 #: ../Pinta.Core/Classes/Document.cs:783
-msgid "Paste Into New Layer"
+msgid "Paste Into New _Layer"
 msgstr "الصق في طبقة جديدة"
 
 #: ../Pinta.Core/Actions/EditActions.cs:76
-msgid "Paste Into New Image"
+msgid "Paste Into New I_mage"
 msgstr "الصق في صورة جديدة"
 
 #: ../Pinta.Core/Actions/EditActions.cs:77
 #: ../Pinta.Core/Actions/EditActions.cs:231
-msgid "Erase Selection"
+msgid "_Erase Selection"
 msgstr "امحُ التّحديد"
 
 #: ../Pinta.Core/Actions/EditActions.cs:78
 #: ../Pinta.Core/Actions/EditActions.cs:191
-msgid "Fill Selection"
+msgid "_Fill Selection"
 msgstr "عبّأ المنطقة المُحددة"
 
 #: ../Pinta.Core/Actions/EditActions.cs:79
 #: ../Pinta.Core/Actions/EditActions.cs:422
-msgid "Invert Selection"
+msgid "_Invert Selection"
 msgstr "اعكس التّحديد"
 
 #: ../Pinta.Core/Actions/EditActions.cs:80
 #: ../Pinta.Core/Actions/EditActions.cs:200
-msgid "Select All"
+msgid "_Select All"
 msgstr "حدّد الكلّ"
 
 #: ../Pinta.Core/Actions/EditActions.cs:81
-msgid "Deselect All"
+msgid "_Deselect All"
 msgstr "أزل التحديد عن الكل"
 
 #: ../Pinta.Core/Actions/EditActions.cs:83
 #: ../Pinta.Core/Actions/FileActions.cs:56
-msgid "Open..."
+msgid "_Open..."
 msgstr "افتح..."
 
 #: ../Pinta.Core/Actions/EditActions.cs:84
 #: ../Pinta.Core/Actions/FileActions.cs:68
-msgid "Save As..."
+msgid "Save _As..."
 msgstr "احفظ كـ..."
 
 #: ../Pinta.Core/Actions/EditActions.cs:85
@@ -132,7 +132,7 @@ msgstr "عيّن عدد الألوان"
 
 #: ../Pinta.Core/Actions/EditActions.cs:127 ../Pinta/Pads/ColorPalettePad.cs:42
 #: ../Pinta/Pads/ColorPalettePad.cs:49
-msgid "Palette"
+msgid "P_alette"
 msgstr "لوحة الألوان"
 
 #: ../Pinta.Core/Actions/EditActions.cs:240
@@ -157,32 +157,32 @@ msgid "Save Palette File"
 msgstr "احفظ ملفّ لوحة الألوان"
 
 #: ../Pinta.Core/Actions/FileActions.cs:54
-msgid "New..."
+msgid "_New..."
 msgstr "جديد..."
 
 #: ../Pinta.Core/Actions/FileActions.cs:55
-msgid "New Screenshot..."
+msgid "New Screensho_t..."
 msgstr "لقطة جديدة للشّاشة..."
 
 #: ../Pinta.Core/Actions/FileActions.cs:57
-msgid "Open Recent"
+msgid "Open _Recent"
 msgstr ""
 
 #: ../Pinta.Core/Actions/FileActions.cs:66
 #: ../Pinta.Docking/DockLibrary/DockItemTitleTab.cs:175
-msgid "Close"
+msgid "_Close"
 msgstr "أغلق"
 
 #: ../Pinta.Core/Actions/FileActions.cs:67
-msgid "Save"
+msgid "_Save"
 msgstr "احفظ"
 
 #: ../Pinta.Core/Actions/FileActions.cs:69
-msgid "Print"
+msgid "_Print"
 msgstr "اطبع"
 
 #: ../Pinta.Core/Actions/FileActions.cs:70
-msgid "Quit"
+msgid "_Quit"
 msgstr "أنهِ"
 
 #: ../Pinta.Core/Actions/FileActions.cs:72
@@ -194,113 +194,113 @@ msgid "Open"
 msgstr "افتح"
 
 #: ../Pinta.Core/Actions/HelpActions.cs:52
-msgid "Contents"
+msgid "_Contents"
 msgstr "المحتويات"
 
 #: ../Pinta.Core/Actions/HelpActions.cs:53
-msgid "Pinta Website"
+msgid "Pinta _Website"
 msgstr "موقع البرنامج"
 
 #: ../Pinta.Core/Actions/HelpActions.cs:54
-msgid "File a Bug"
+msgid "File a _Bug"
 msgstr "أبلغ عن علّة"
 
 #: ../Pinta.Core/Actions/HelpActions.cs:55
-msgid "Translate This Application"
+msgid "_Translate This Application"
 msgstr "ترجم هذا التّطبيق"
 
 #: ../Pinta.Core/Actions/HelpActions.cs:56 ../Pinta/MainWindow.cs:368
-msgid "About"
+msgid "_About"
 msgstr "عنْ"
 
 #: ../Pinta.Core/Actions/ImageActions.cs:60
 #: ../Pinta.Core/Actions/ImageActions.cs:284
-msgid "Crop to Selection"
+msgid "Cro_p to Selection"
 msgstr "اقتص وفقًا للتّحديد"
 
 #: ../Pinta.Core/Actions/ImageActions.cs:61
-msgid "Auto Crop"
+msgid "_Auto Crop"
 msgstr "اقتصاص آلي"
 
 #: ../Pinta.Core/Actions/ImageActions.cs:62
-msgid "Resize Image..."
+msgid "_Resize Image..."
 msgstr "غيّر مقاس الصورة..."
 
 #: ../Pinta.Core/Actions/ImageActions.cs:63
-msgid "Resize Canvas..."
+msgid "Canvas _Size..."
 msgstr "غيّر مقاس مساحة الرسم..."
 
 #: ../Pinta.Core/Actions/ImageActions.cs:64
 #: ../Pinta.Core/Actions/LayerActions.cs:70
-msgid "Flip Horizontal"
+msgid "Flip _Horizontal"
 msgstr "اقلب أفقيًّا"
 
 #: ../Pinta.Core/Actions/ImageActions.cs:65
 #: ../Pinta.Core/Actions/LayerActions.cs:71
-msgid "Flip Vertical"
+msgid "Flip _Vertical"
 msgstr "اقلب رأسيًّا"
 
 #: ../Pinta.Core/Actions/ImageActions.cs:66
 #: ../Pinta.Core/HistoryItems/InvertHistoryItem.cs:62
-msgid "Rotate 90° Clockwise"
+msgid "Rotate 9_0° Clockwise"
 msgstr "دوّر 90 درجة باتّجاه عقارب السّاعة"
 
 #: ../Pinta.Core/Actions/ImageActions.cs:67
 #: ../Pinta.Core/HistoryItems/InvertHistoryItem.cs:66
-msgid "Rotate 90° Counter-Clockwise"
+msgid "Rotate _90° Counter-Clockwise"
 msgstr "دوّر 90 درجة باتّجاه عكس عقارب السّاعة"
 
 #: ../Pinta.Core/Actions/ImageActions.cs:68
 #: ../Pinta.Core/HistoryItems/InvertHistoryItem.cs:50
-msgid "Rotate 180°"
+msgid "Rotate 1_80°"
 msgstr "دوّر 180 درجة"
 
 #: ../Pinta.Core/Actions/ImageActions.cs:69
 #: ../Pinta.Core/Actions/ImageActions.cs:146
-msgid "Flatten"
+msgid "_Flatten"
 msgstr "سطّح"
 
 #: ../Pinta.Core/Actions/LayerActions.cs:65
 #: ../Pinta.Core/Actions/LayerActions.cs:292
 #: ../Pinta.Core/Classes/Document.cs:846
-msgid "Add New Layer"
+msgid "_Add New Layer"
 msgstr "أضف طبقة جديدة"
 
 #: ../Pinta.Core/Actions/LayerActions.cs:66
 #: ../Pinta.Core/Actions/LayerActions.cs:275
-msgid "Delete Layer"
+msgid "De_lete Layer"
 msgstr "احذف الطّبقة"
 
 #: ../Pinta.Core/Actions/LayerActions.cs:67
 #: ../Pinta.Core/Actions/LayerActions.cs:266
-msgid "Duplicate Layer"
+msgid "_Duplicate Layer"
 msgstr "كرر الطبقة"
 
 #: ../Pinta.Core/Actions/LayerActions.cs:68
 #: ../Pinta.Core/Actions/LayerActions.cs:244
-msgid "Merge Layer Down"
+msgid "_Merge Layer Down"
 msgstr "ادمج الطّبقة مع الطّبقة تحتها"
 
 #: ../Pinta.Core/Actions/LayerActions.cs:69
-msgid "Import from File..."
+msgid "_Import from File..."
 msgstr "استورد من ملفّ..."
 
 #: ../Pinta.Core/Actions/LayerActions.cs:72
-msgid "Rotate / Zoom Layer..."
+msgid "_Rotate / _Zoom Layer..."
 msgstr "تدوير/تكبير الطبقة..."
 
 #: ../Pinta.Core/Actions/LayerActions.cs:73
 #: ../Pinta.Core/Actions/LayerActions.cs:219
-msgid "Move Layer Up"
+msgid "Move Layer _Up"
 msgstr "تحريك الطبقة لأعلى"
 
 #: ../Pinta.Core/Actions/LayerActions.cs:74
 #: ../Pinta.Core/Actions/LayerActions.cs:230
-msgid "Move Layer Down"
+msgid "Move Layer D_own"
 msgstr "تحريك الطبقة لأسفل"
 
 #: ../Pinta.Core/Actions/LayerActions.cs:75
-msgid "Layer Properties..."
+msgid "Layer _Properties..."
 msgstr "خصائص الطّبقة..."
 
 #: ../Pinta.Core/Actions/LayerActions.cs:157
@@ -313,39 +313,39 @@ msgid "Import From File"
 msgstr "استورد من ملفّ"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:77
-msgid "Zoom In"
+msgid "Zoom _In"
 msgstr "كبّر"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:78
-msgid "Zoom Out"
+msgid "Zoom _Out"
 msgstr "صغّر"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:79
-msgid "Best Fit"
+msgid "_Best Fit"
 msgstr "أفضل ملائمة"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:80
-msgid "Zoom to Selection"
+msgid "Zoom to _Selection"
 msgstr "عدّل الحجم ليناسب التحديد"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:81
-msgid "Normal Size"
+msgid "_Normal Size"
 msgstr "الحجم الطبيعي"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:82
-msgid "Toolbar"
+msgid "_Toolbar"
 msgstr "شريط الأدوات"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:83
-msgid "Image Tabs"
+msgid "Im_age Tabs"
 msgstr ""
 
 #: ../Pinta.Core/Actions/ViewActions.cs:84
-msgid "Pixel Grid"
+msgid "Pixel _Grid"
 msgstr "شبكة البكسلات"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:85
-msgid "Rulers"
+msgid "_Rulers"
 msgstr "المساطر"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:86
@@ -361,7 +361,7 @@ msgid "Centimeters"
 msgstr "سنتيمترات"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:89
-msgid "Fullscreen"
+msgid "_Fullscreen"
 msgstr "كامل الشاشة"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:115
@@ -372,7 +372,7 @@ msgid "Window"
 msgstr "النافذة"
 
 #: ../Pinta.Core/Actions/ViewActions.cs:163
-msgid "Ruler Units"
+msgid "Ruler _Units"
 msgstr "وحدات المسطرة"
 
 #. Translators: This specifies the format of the zoom percentage choices
@@ -383,11 +383,11 @@ msgid "{0}%"
 msgstr "{0}%"
 
 #: ../Pinta.Core/Actions/WindowActions.cs:45
-msgid "Save All"
+msgid "_Save All"
 msgstr "احفظ الكلّ"
 
 #: ../Pinta.Core/Actions/WindowActions.cs:46
-msgid "Close All"
+msgid "_Close All"
 msgstr "أغلق الكلّ"
 
 #: ../Pinta.Core/Classes/BaseTool.cs:262
@@ -2122,7 +2122,7 @@ msgid "_Window"
 msgstr "_نافذة"
 
 #: ../Pinta/MainWindow.cs:346
-msgid "Tool Windows"
+msgid "Tool _Windows"
 msgstr "نوافذ الأدوات"
 
 #: ../Pinta/MainWindow.cs:350
@@ -2153,7 +2153,7 @@ msgid "Canvas"
 msgstr "رقعة"
 
 #: ../Pinta/Pads/HistoryPad.cs:43 ../Pinta/Pads/HistoryPad.cs:52
-msgid "History"
+msgid "_History"
 msgstr "التاريخ"
 
 #: ../Pinta/Pads/LayersPad.cs:43 ../Pinta/Pads/LayersPad.cs:56
@@ -2161,11 +2161,11 @@ msgid "Layers"
 msgstr "الطبقات"
 
 #: ../Pinta/Pads/OpenImagesPad.cs:41 ../Pinta/Pads/OpenImagesPad.cs:48
-msgid "Images"
+msgid "_Images"
 msgstr ""
 
 #: ../Pinta/Pads/ToolBoxPad.cs:42 ../Pinta/Pads/ToolBoxPad.cs:49
-msgid "Tools"
+msgid "_Tools"
 msgstr ""
 
 #: Polar Inversion dialog
