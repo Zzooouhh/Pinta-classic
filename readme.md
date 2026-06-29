@@ -1,3 +1,74 @@
+# Pinta-classic - patchset for Pinta 1.7.1
+
+This is an independent fork of Pinta 1.7.1 intended to address certain long-standing usability issues and missing UI features in this version of the application, while preserving the classic GTK2 interface and being simple to implement and maintain over the base version. Rather than file bug reports and wait for upstream changes, I've decided to implement these directly into the codebase on my own with the assistance of LLM tools. All of the patches that came out of this process were individually tested by myself to ensure their intended functionality.
+
+This is not intended as a replacement for the current upstream Pinta project, rather it is an alternative for users who prefer the GTK2-based interface and would prefer a version of Pinta with a more Paint.NET styled workflow.
+
+Reasons for basing this project on Pinta 1.7.1 include:
+
+1. Some Linux distributions and FreeBSD still include Pinta 1.7.1 as the latest packaged version. This fork originally began as (and still remains) a drop-in replacement for the FreeBSD port.
+2. The 1.7.1 codebase still contained numerous bugs and usability issues. Pinta Classic addresses many of these and includes workflow improvements inspired by Paint.NET.
+3. I prefer the classic GTK2 interface and a keyboard-and-mouse-focused use case aimed for desktop/laptop users.
+
+See `CHANGELOG.md` for a complete list of changes.
+
+
+## Controls
+
+Most hotkeys and mnemonics should be recognizable by popups, menu displays or other visual indicators. Here is a list of other controls which are not elaborated upon in Pinta-classic itself:
+
+### Zoom/Pan
+| Key | Action |
+| --- | --- |
+| Mousewheel | scroll canvas |
+| Shift+Mousewheel | scroll canvas (horizontal only) |
+| Ctrl+Mousewheel | zoom in/out |
+| +,- | zoom in/out |
+| Hold middle mouse | pan |
+
+### Pencil/Brush/Eraser/Recolor
+| Key | Action |
+| --- | --- |
+| Alt+draw | quick color picker |
+| Shift+draw | straight line snapped to a 15 degree angle |
+| Ctrl+Shift+draw | straight line not snapped to an angle (full 360 degrees) |
+| [] | change brush size (by 1) |
+| Shift+[] | change brush size (by 5) |
+| Ctrl+Shift+A | toggle Antialiasing on/off |
+
+### Fill/Magic Wand/Recolor
+| Key | Action |
+| --- | --- |
+| Ctrl+[] | change tolerance (by 1) |
+| Ctrl+Shift+[] | change tolerance (by 10) |
+| Ctrl+Shift+F (for Fill, Magic Wand) | toggle Flood mode global/contiguous |
+| Hold Shift+draw (while using Fill, Magic Wand) | apply the unselected flood mode (e.g. if Global is selected, Contiguous will be used) |
+
+### Selection
+| Key | Action |
+| --- | --- |
+| Esc, Shift+D, Enter | any of these will deselect selection |
+| Arrow keys | move selection (by 1) |
+| Ctrl+Arrow keys | move selection (by 10) |
+
+### Shapes
+| Key | Action |
+| --- | --- |
+| PageUp/PageDown | cycle between control points of current shape |
+| Shift+PageUp/PageDown | cycle between shapes (first control point will be selected) |
+
+### Tabs
+| Key | Action |
+| --- | --- |
+| Ctrl+Tab, Ctrl+PageDown | go to next tab |
+| Ctrl+Shift+Tab, Ctrl+PageUp | go to previous tab |
+| Ctrl+Shift+PageUp/PageDown | move current tab to next/previous index |
+| Alt+number | jump to tab with specified index |
+
+
+The remainder of this README describes the original Pinta 1.7.1 release and much of it remains applicable to Pinta-classic.
+
+
 # Pinta - [Simple Gtk# Paint Program](http://pinta-project.com/)
 
 [![Build Status](https://github.com/PintaProject/Pinta/workflows/Build/badge.svg)](https://github.com/PintaProject/Pinta/actions)
