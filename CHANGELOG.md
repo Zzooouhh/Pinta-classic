@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project (beginning with version 1.7) will be documented in this file.
 
-## [Unreleased](https://github.com/PintaProject/Pinta/compare/1.7.1...HEAD)
+## [Unreleased](https://github.com/Zzooouhh/Pinta-classic/compare/1.7.1...HEAD)
 
 Thanks to the following contributors who worked on this release:
 - @cameronwhite
@@ -11,6 +11,67 @@ Thanks to the following contributors who worked on this release:
 ### Changed
 
 ### Fixed
+
+## [1.7.1c1](https://github.com/Zzooouhh/Pinta-classic/releases/tag/1.7.1c1)
+
+Thanks to all the contributors who worked on the Pinta 1.7.1 release.
+
+### Added
+- Implemented single-instance mode for Pinta (parameter "-p")
+- Included language option independent on environment variables (parameter "-l" when running Pinta)
+- Implemented parameters for specifying default document width/height (parameter "default-width=", default-height=") and for disabling default document (parameter "-n")
+- Added menu toggle to hide Menubar (Ctrl+M)
+- Added mnemonics and accelerators for entries in menubar menus
+- Added "move by 10 pixels" keyboard option by holding Ctrl+Arrow
+- Added option to change selection size via cursor keys (also applies to Lasso)
+- Now possible to deselect selection by pressing Enter or Escape
+- Now possible to finalize shape by pressing Enter or Escape
+- Added keyboard hotkeys for cycling between image tabs (Alt+number, Ctrl+PageUp/PageDown, Ctrl+Tab, Shift+Ctrl+Tab) and for reordering tabs (Ctrl+Shift+PageUp/PageDown)
+- Added "Ctrl+Shift+A" hotkey to toggle Antialiasing on/off
+- Added "Ctrl+Shift+F" hotkey to toggle Global/Contiguous flood mode
+- Hold Shift+Click to use the opposite flood mode as currently selected
+- Hold Shift+Brush/Pencil to draw straight line at 15 degree angles
+- Hold Shift+Ctrl+Brush/Pencil to draw freeform straight line
+- Change brush size via bracket keys "[]" (by 1) or Shift+brackets "{}" (by 5)
+- Change tolerance via Ctrl+bracket keys "[]" (by 1) or Ctrl+Shift+brackets "{}" (by 10)
+- Shift + click brush size button now changes brush size by 5
+- Added more layer menu options: Go to Layer Above (Alt + PgUp), Go to Layer Below (Alt + PgDn), Toggle Hide/Show Layer (Ctrl + Shift + H), Move Layer Up (Ctrl + Shift + PgUp), Move Layer Down (Ctrl + Shift + PgDn)
+- Added quick colorpicker by pressing Alt+Click (left or right mouse button)
+- Can now hold middle-mouse to pan picture
+- Added "Nearest Neighbour" option in resize dialog
+- Added display of the current selection's min X,Y point (i.e. origin) in the MainToolbar
+- Added hexcode swatch display of the current cursor point in the MainToolbar
+- Added hex code quick display for the current selected primary color on the Palette pad
+
+### Changed
+- Selections now remember the position of the original selection and will paste to the same position
+- Pasting a selection with empty space now automatically erases that empty space
+- Switched antialiasing button style for brush tools to be more tactile
+- Allowed arrow keys to move selection even if Select Tool is selected
+- Removed canvas drop shadow around the canvas border
+- Various style changes for image tabs
+- Potfiles were standardized to be compatible with new menu mnemonics
+
+### Fixed
+- Fixed unhandled exception when pasting selection larger than canvas with or without expanding it
+- Fixed error with "file format" when editing png/jpg
+- Pinta now prompts the same folder for picture Save as... as picture origin
+- Backported numerous CanvasRenderer fixes from upstream for better performance
+- Fixed numerous bugs with selection tool (Select All lacking handles, register bug with handles, selecting and expanding selection incorrectly assigns handles, paste history bug)
+- Fixed buggy brush behavior skipping left and upper pixels
+- Backported Ctrl+Backspace option to delete whole words in text engine + small bugfix regarding Ctrl+Left in text engine
+- Fixed canvas clamping bug with draw shape tool
+- Pressing "S" hotkey after pasting selection would previously shift directly to Lasso tool, now fixed
+- "Best Fit" (Ctrl+B) would previously fail to properly resize zoom on certain image dimensions, now fixed
+- Fixed crop tool failing to crop left and bottom edges; fixed crash if cropped image is moved again without alteration
+- Clicking history item in the History pad now properly updates canvas
+- Fixed multiple issues with misbehaving Recent Files list
+- Fixed UI inconsistency issue when reordering image tabs
+- Fixed visual cursor quirk when applying zoom
+- Fixed occasional "hall of mirrors" visual bug when zooming out of picture
+- Backported Levels dialog fix from upstream
+- Fixed focusing issue with Save Changes dialog
+- Fixed light/dark UI color display for image tabs and pads
 
 ## [1.7.1](https://github.com/PintaProject/Pinta/releases/tag/1.7.1) - 2021/11/20
 
